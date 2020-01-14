@@ -162,7 +162,7 @@ EOF;
 		}
 		$html .= '<tr class="inline_row">'.
 		             '<td class="trow'.($i+1).' forumdisplay_regular" style="text-align: left;">'.prt_get_threadlink($row['tid'], $row['thread_subject']).'<div class="smalltext"><span class="author">'.prt_get_usernamelink($row['thread_uid'], $row['thread_username']).'</span> <span style="float: right;">'.my_date('normal', $row['thread_dateline']).'</span></div></td>'.
-		             '<td class="trow'.($i+1).'">'.$row['num_posts'].'</td>'.
+		             '<td class="trow'.($i+1).'">'.my_number_format($row['num_posts']).'</td>'.
 		             '<td class="trow'.($i+1).'">'.prt_get_flinks($row['parentlist'], $forum_names).'</td>'.
 		             '<td class="trow'.($i+1).'" style="text-align: right;">'.prt_get_postlink($row['min_pid'], my_date('normal', $row['min_dateline'])).'<div class="smalltext"><span class="author">'.prt_get_usernamelink($row['min_uid'], $row['min_username']).'</span></div></td>'.
 		             '<td class="trow'.($i+1).'" style="text-align: right;">'.prt_get_postlink($row['max_pid'], my_date('normal', $row['max_dateline'])).'<div class="smalltext"><span class="author">'.prt_get_usernamelink($row['max_uid'], $row['max_username']).'</span></div></td>'.
