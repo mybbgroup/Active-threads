@@ -70,6 +70,8 @@ if ($active_plugins && $active_plugins['popular_recent_threads']) {
 	$sql = "
 SELECT mainq.tid,
        mainq.thread_subject,
+       mainq.thread_uid,
+       mainq.thread_username,
        mainq.parentlist,
        mainq.fid,
        mainq.forum_name,
@@ -87,6 +89,8 @@ SELECT mainq.tid,
 FROM
 (SELECT     t.tid,
             t.subject AS thread_subject,
+            uthr.uid AS thread_uid,
+            uthr.username AS thread_username,
             f.parentlist,
             f.fid,
             f.name AS forum_name,
@@ -96,6 +100,7 @@ FROM
  FROM       mybb_threads t
  INNER JOIN mybb_posts p  ON t.tid = p.tid
  INNER JOIN mybb_forums f ON f.fid = t.fid
+ INNER JOIN mybb_users uthr ON uthr.uid = t.uid
  WHERE      $conds
  GROUP BY   p.tid
  ORDER BY   count(p.pid) DESC) AS mainq
@@ -135,45 +140,30 @@ INNER JOIN mybb_users umin ON umin.uid      = pmin.uid";
 	foreach ($rows as $row) {
 		$i = 1 - $i;
 		if (!$html) {
-			$lang_num_posts_in_last_x_days = $lang->sprintf($lang->prt_num_posts_in_last_x_days, PRT_NUM_DAYS);
+			$lang_pop_recent_threads_title = $lang->sprintf($lang->prt_pop_recent_threads_title, PRT_NUM_DAYS);
 			$html =<<<EOF
 <table class="tborder tfixed clear">
 	<thead>
 		<tr>
-			<th class="thead" colspan="9">{$lang->prt_pop_recent_threads_title}</td>
+			<th class="thead" colspan="5">{$lang_pop_recent_threads_title}</td>
 		</tr>
 		<tr>
-			<th class="tcat">{$lang->prt_thread}</th>
-			<th class="tcat">{$lang_num_posts_in_last_x_days}</th>
+			<th class="tcat" style="text-align: left;">{$lang->prt_thread} / {$lang->prt_author}</th>
+			<th class="tcat">{$lang->prt_num_posts}</th>
 			<th class="tcat">{$lang->prt_cont_forum}</th>
-			<th class="tcat" colspan="3">{$lang->prt_earliest_posting}</th>
-			<th class="tcat" colspan="3">{$lang->prt_latest_posting}</th>
-		</tr>
-		<tr>
-			<th class="tcat"></th>
-			<th class="tcat"></th>
-			<th class="tcat"></th>
-			<th class="tcat">{$lang->prt_subject}</th>
-			<th class="tcat">{$lang->prt_author}</th>
-			<th class="tcat">{$lang->prt_date}</th>
-			<th class="tcat">{$lang->prt_subject}</th>
-			<th class="tcat">{$lang->prt_author}</th>
-			<th class="tcat">{$lang->prt_date}</th>
+			<th class="tcat" style="text-align: right;">{$lang->prt_earliest_posting}</th>
+			<th class="tcat" style="text-align: right;">{$lang->prt_latest_posting}</th>
 		</tr>
 	</thead>
 	<tbody>
 EOF;
 		}
 		$html .= '<tr class="inline_row">'.
-		             '<td class="trow'.($i+1).' forumdisplay_regular">'.prt_get_threadlink($row['tid'], $row['thread_subject']).'</td>'.
+		             '<td class="trow'.($i+1).' forumdisplay_regular" style="text-align: left;"><strong>'.prt_get_threadlink($row['tid'], $row['thread_subject']).'</strong><div class="smalltext"><span class="author">'.prt_get_usernamelink($row['thread_uid'], $row['thread_username']).'</span></div></td>'.
 		             '<td class="trow'.($i+1).'">'.$row['num_posts'].'</td>'.
 		             '<td class="trow'.($i+1).'">'.prt_get_flinks($row['parentlist'], $forum_names).'</td>'.
-		             '<td class="trow'.($i+1).'">'.prt_get_postlink($row['min_pid'], $row['min_subject']).'</td>'.
-		             '<td class="trow'.($i+1).'">'.prt_get_usernamelink($row['min_uid'], $row['min_username']).'</td>'.
-		             '<td class="trow'.($i+1).'">'.my_date('normal', $row['min_dateline']).'</td>'.
-		             '<td class="trow'.($i+1).'">'.prt_get_postlink($row['max_pid'], $row['max_subject']).'</td>'.
-		             '<td class="trow'.($i+1).'">'.prt_get_usernamelink($row['max_uid'], $row['max_username']).'</td>'.
-		             '<td class="trow'.($i+1).'">'.my_date('normal', $row['max_dateline']).'</td>'.
+		             '<td class="trow'.($i+1).'" style="text-align: right;">'.prt_get_postlink($row['min_pid'], my_date('normal', $row['min_dateline'])).'<div class="smalltext"><span class="author">'.prt_get_usernamelink($row['min_uid'], $row['min_username']).'</span></div></td>'.
+		             '<td class="trow'.($i+1).'" style="text-align: right;">'.prt_get_postlink($row['max_pid'], my_date('normal', $row['max_dateline'])).'<div class="smalltext"><span class="author">'.prt_get_usernamelink($row['max_uid'], $row['max_username']).'</span></div></td>'.
 		         '</tr>';
 	}
 
