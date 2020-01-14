@@ -46,6 +46,8 @@ if (!is_array($plugins_cache)) {
 $active_plugins = $plugins_cache['active'];
 
 if ($active_plugins && $active_plugins['popular_recent_threads']) {
+	$max_interval = $mybb->settings[C_PRT.'_max_interval_in_secs'];
+
 	$days = $mybb->get_input('days', MyBB::INPUT_INT);
 	$hours = $mybb->get_input('hours', MyBB::INPUT_INT);
 	$mins = $mybb->get_input('mins', MyBB::INPUT_INT);
@@ -54,7 +56,9 @@ if ($active_plugins && $active_plugins['popular_recent_threads']) {
 	$page = $mybb->get_input('page', MyBB::INPUT_INT);
 
 	if ($days == 0 && $hours == 0 && $mins == 0 && $secs == 0) {
-		$days = PRT_NUM_DAYS;
+		if (PRT_NUM_DAYS * 24*60*60 > $max_interval) {
+			$secs = $max_interval;
+		} else	$days = PRT_NUM_DAYS;
 	}
 	if (!$page) $page = 1;
 
@@ -78,6 +82,10 @@ if ($active_plugins && $active_plugins['popular_recent_threads']) {
 		$date_for_title = $lang->prt_now;
 	}
 	$date_prior = my_date('normal', $ts_epoch - $secs_before);
+
+	if ($max_interval > 0 && $secs_before > $max_interval) {
+		error($lang->sprintf($lang->prt_err_excess_int, $secs_before, $max_interval));
+	}
 
 	$conds = 'p.dateline >= '.($ts_epoch - $secs_before).' AND p.dateline <= '.$ts_epoch;
 
@@ -155,7 +163,7 @@ LIMIT ".(($page-1) * PRT_ITEMS_PER_PAGE).", ".PRT_ITEMS_PER_PAGE;
 	$res = $db->query($sql);
 	$rows = $forum_names = array();
 	
-	$html = '';
+	$result_rows = '';
 	while (($row = $db->fetch_array($res))) {
 		$forum_names[$row['fid']] = $row['forum_name'];
 		foreach (explode(',', $row['parentlist']) as $fid) {
@@ -180,93 +188,33 @@ LIMIT ".(($page-1) * PRT_ITEMS_PER_PAGE).", ".PRT_ITEMS_PER_PAGE;
 	}
 
 	$i = 1;
-	foreach ($rows as $row) {
-		$i = 1 - $i;
-		if (!$html) {
-			$lang_pop_recent_threads_title = $lang->sprintf($lang->prt_pop_recent_threads_title, $days, $hours, $mins, $secs, $date_prior, $date_for_title);
-			$html =<<<EOF
-<table class="tborder tfixed clear">
-	<thead>
-		<tr>
-			<th class="thead" colspan="5">{$lang_pop_recent_threads_title}</td>
-		</tr>
-		<tr>
-			<th class="tcat" style="text-align: left;">{$lang->prt_thread_author_start}</th>
-			<th class="tcat">{$lang->prt_num_posts}</th>
-			<th class="tcat">{$lang->prt_cont_forum}</th>
-			<th class="tcat" style="text-align: right;">{$lang->prt_earliest_posting}</th>
-			<th class="tcat" style="text-align: right;">{$lang->prt_latest_posting}</th>
-		</tr>
-	</thead>
-	<tbody>
-EOF;
+	if ($rows) {
+		foreach ($rows as $row) {
+			$i = 1 - $i;
+			$bgcolor = 'trow'.($i+1);
+			$thread_link = prt_get_threadlink($row['tid'], $row['thread_subject']);
+			$thread_username_link = prt_get_usernamelink($row['thread_uid'], $row['thread_username']);
+			$thread_date = my_date('normal', $row['thread_dateline']);
+			$num_posts_fmt = my_number_format($row['num_posts']);
+			$forum_links = prt_get_flinks($row['parentlist'], $forum_names);
+			$min_post_date_link = prt_get_postlink($row['min_pid'], my_date('normal', $row['min_dateline']));
+			$min_post_username_link = prt_get_usernamelink($row['min_uid'], $row['min_username']);
+			$max_post_date_link = prt_get_postlink($row['max_pid'], my_date('normal', $row['max_dateline']));
+			$max_post_username_link = prt_get_usernamelink($row['max_uid'], $row['max_username']);
+			eval("\$result_rows .= \"".$templates->get('popularrecentthreads_result_row', 1, 0)."\";");
 		}
-		$html .= '<tr class="inline_row">'.
-		             '<td class="trow'.($i+1).' forumdisplay_regular" style="text-align: left;">'.prt_get_threadlink($row['tid'], $row['thread_subject']).'<div class="smalltext"><span class="author">'.prt_get_usernamelink($row['thread_uid'], $row['thread_username']).'</span> <span style="float: right;">'.my_date('normal', $row['thread_dateline']).'</span></div></td>'.
-		             '<td class="trow'.($i+1).'">'.my_number_format($row['num_posts']).'</td>'.
-		             '<td class="trow'.($i+1).'">'.prt_get_flinks($row['parentlist'], $forum_names).'</td>'.
-		             '<td class="trow'.($i+1).'" style="text-align: right;">'.prt_get_postlink($row['min_pid'], my_date('normal', $row['min_dateline'])).'<div class="smalltext"><span class="author">'.prt_get_usernamelink($row['min_uid'], $row['min_username']).'</span></div></td>'.
-		             '<td class="trow'.($i+1).'" style="text-align: right;">'.prt_get_postlink($row['max_pid'], my_date('normal', $row['max_dateline'])).'<div class="smalltext"><span class="author">'.prt_get_usernamelink($row['max_uid'], $row['max_username']).'</span></div></td>'.
-		         '</tr>';
-	}
 
-	if ($html) {
-		$html .= '</tbody></table>';
+		$lang_pop_recent_threads_title = $lang->sprintf($lang->prt_pop_recent_threads_title, $days, $hours, $mins, $secs, $date_prior, $date_for_title);
+		eval("\$results_html = \"".$templates->get('popularrecentthreads_results', 1, 0)."\";");
+
 	} else {
-		$html = '<p style="text-align: center">'.$lang->prt_no_results.'</p>';
+		$results_html = '<p style="text-align: center">'.$lang->prt_no_results.'</p>';
 	}
 	$prt_before_date_tooltip = htmlspecialchars_uni($lang->prt_before_date_tooltip);
 	$prt_set_period_of_interest_tooltip = htmlspecialchars_uni($lang->prt_set_period_of_interest_tooltip);
 	$prt_set_period_of_interest = htmlspecialchars_uni($lang->prt_set_period_of_interest);
 	$multipage = multipage($tot_rows, PRT_ITEMS_PER_PAGE, $page, "popular_recent_threads.php&days=$days&hours=$hours&mins=$mins&secs=$secs&date=".urlencode($date)."&page={page}");
 	add_breadcrumb($lang->prt_pop_recent_threads_breadcrumb, C_PRT.'.php');
-	output_page(<<<EOF
-<html>
-<head>
-<title>{$mybb->settings['bbname']} - {$lang->prt_pop_recent_threads_title_short}</title>
-{$headerinclude}
-<style type="text/css">
-table, td, th {
-	text-align: center;
-	border-spacing: 0;
-}
-</style>
-</head>
-<body>
-{$header}
-<form method="get" action="popular_recent_threads.php">
-<table class="tborder tfixed clear">
-	<thead>
-		<tr>
-			<th class="thead" colspan="6" title="{$prt_set_period_of_interest_tooltip}">{$prt_set_period_of_interest}</td>
-		</tr>
-		<tr>
-			<th class="tcat">{$lang->prt_num_days}</th>
-			<th class="tcat">{$lang->prt_num_hours}</th>
-			<th class="tcat">{$lang->prt_num_mins}</th>
-			<th class="tcat">{$lang->prt_num_secs}</th>
-			<th class="tcat" title="{$prt_before_date_tooltip}">{$lang->prt_before_date}</th>
-			<th class="tcat"></th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-			<td><input type="text" name="days" value="$days" style="text-align: right;"/></td>
-			<td><input type="text" name="hours" value="$hours" style="text-align: right;" /></td>
-			<td><input type="text" name="mins" value="$mins" style="text-align: right;" /></td>
-			<td><input type="text" name="secs" value="$secs" style="text-align: right;" /></td>
-			<td><input type="text" name="date" value="$date" style="text-align: right;" title="{$prt_before_date_tooltip}" /></td>
-			<td><input type="submit" name="go" value="{$lang->prt_go}" /></td>
-		</tr>
-	</tbody>
-</table>
-</form>
-{$multipage}
-{$html}
-{$multipage}
-{$footer}
-</body>
-</html>
-EOF
-);
+	eval("\$html = \"".$templates->get('popularrecentthreads_page', 1, 0)."\";");
+	output_page($html);
 } else	echo $lang->prt_inactive;
