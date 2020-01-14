@@ -61,8 +61,14 @@ if ($active_plugins && $active_plugins['popular_recent_threads']) {
 	$secs_before = $secs_before * 60 + $secs;
 
 	if ($date) {
-		$ts_epoch = strtotime($date);
+		if ($mybb->user['dst'] == 1) {
+			$timezone = (float)$mybb->user['timezone']+1;
+		} else	$timezone = (float)$mybb->user['timezone'];
+		$tz_org = date_default_timezone_get();
+		date_default_timezone_set('GMT');
+		$ts_epoch = strtotime($date, TIME_NOW + $timezone*60*60) - $timezone*60*60;
 		$date_for_title = $date;
+		date_default_timezone_set($tz_org);
 	} else {
 		$ts_epoch = TIME_NOW;
 		$date = 'Now';
@@ -238,7 +244,7 @@ table, td, th {
 			<td><input type="text" name="hours" value="$hours" style="text-align: right;" /></td>
 			<td><input type="text" name="mins" value="$mins" style="text-align: right;" /></td>
 			<td><input type="text" name="secs" value="$secs" style="text-align: right;" /></td>
-			<td><input type="text" name="date" value="$date" title="{$prt_before_date_tooltip}" /></td>
+			<td><input type="text" name="date" value="$date" style="text-align: right;" title="{$prt_before_date_tooltip}" /></td>
 			<td><input type="submit" name="go" value="{$lang->prt_go}" /></td>
 		</tr>
 	</tbody>
