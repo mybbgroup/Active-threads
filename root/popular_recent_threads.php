@@ -70,6 +70,7 @@ if ($active_plugins && $active_plugins['popular_recent_threads']) {
 	$sql = "
 SELECT mainq.tid,
        mainq.thread_subject,
+       mainq.thread_dateline,
        mainq.thread_uid,
        mainq.thread_username,
        mainq.parentlist,
@@ -89,6 +90,7 @@ SELECT mainq.tid,
 FROM
 (SELECT     t.tid,
             t.subject AS thread_subject,
+            t.dateline AS thread_dateline,
             uthr.uid AS thread_uid,
             uthr.username AS thread_username,
             f.parentlist,
@@ -148,7 +150,7 @@ INNER JOIN mybb_users umin ON umin.uid      = pmin.uid";
 			<th class="thead" colspan="5">{$lang_pop_recent_threads_title}</td>
 		</tr>
 		<tr>
-			<th class="tcat" style="text-align: left;">{$lang->prt_thread} / {$lang->prt_author}</th>
+			<th class="tcat" style="text-align: left;">{$lang->prt_thread_author_start}</th>
 			<th class="tcat">{$lang->prt_num_posts}</th>
 			<th class="tcat">{$lang->prt_cont_forum}</th>
 			<th class="tcat" style="text-align: right;">{$lang->prt_earliest_posting}</th>
@@ -159,7 +161,7 @@ INNER JOIN mybb_users umin ON umin.uid      = pmin.uid";
 EOF;
 		}
 		$html .= '<tr class="inline_row">'.
-		             '<td class="trow'.($i+1).' forumdisplay_regular" style="text-align: left;"><strong>'.prt_get_threadlink($row['tid'], $row['thread_subject']).'</strong><div class="smalltext"><span class="author">'.prt_get_usernamelink($row['thread_uid'], $row['thread_username']).'</span></div></td>'.
+		             '<td class="trow'.($i+1).' forumdisplay_regular" style="text-align: left;">'.prt_get_threadlink($row['tid'], $row['thread_subject']).'<div class="smalltext"><span class="author">'.prt_get_usernamelink($row['thread_uid'], $row['thread_username']).'</span> <span style="float: right;">'.my_date('normal', $row['thread_dateline']).'</span></div></td>'.
 		             '<td class="trow'.($i+1).'">'.$row['num_posts'].'</td>'.
 		             '<td class="trow'.($i+1).'">'.prt_get_flinks($row['parentlist'], $forum_names).'</td>'.
 		             '<td class="trow'.($i+1).'" style="text-align: right;">'.prt_get_postlink($row['min_pid'], my_date('normal', $row['min_dateline'])).'<div class="smalltext"><span class="author">'.prt_get_usernamelink($row['min_uid'], $row['min_username']).'</span></div></td>'.
