@@ -4,6 +4,7 @@ define('IN_MYBB', 1);
 require_once './global.php';
 
 define('PRT_NUM_DAYS', 14);
+define('PRT_ITEMS_PER_PAGE', 20);
 
 if (!isset($lang->popular_recent_threads)) {
 	$lang->load('popular_recent_threads');
@@ -50,10 +51,12 @@ if ($active_plugins && $active_plugins['popular_recent_threads']) {
 	$mins = $mybb->get_input('mins', MyBB::INPUT_INT);
 	$secs = $mybb->get_input('secs', MyBB::INPUT_INT);
 	$date = $mybb->get_input('date');
+	$page = $mybb->get_input('page', MyBB::INPUT_INT);
 
 	if ($days == 0 && $hours == 0 && $mins == 0 && $secs == 0) {
 		$days = PRT_NUM_DAYS;
 	}
+	if (!$page) $page = 1;
 
 	$secs_before = $days;
 	$secs_before = $secs_before * 24 + $hours;
@@ -74,6 +77,7 @@ if ($active_plugins && $active_plugins['popular_recent_threads']) {
 		$date = 'Now';
 		$date_for_title = $lang->prt_now;
 	}
+	$date_prior = my_date('normal', $ts_epoch - $secs_before);
 
 	$conds = 'p.dateline >= '.($ts_epoch - $secs_before).' AND p.dateline <= '.$ts_epoch;
 
@@ -98,6 +102,28 @@ if ($active_plugins && $active_plugins['popular_recent_threads']) {
 	}
 	$conds = '('.$conds.') AND p.visible > 0';
 
+	$inner_sql = "
+ SELECT     t.tid,
+            t.subject AS thread_subject,
+            t.dateline AS thread_dateline,
+            uthr.uid AS thread_uid,
+            uthr.username AS thread_username,
+            f.parentlist,
+            f.fid,
+            f.name AS forum_name,
+            count(p.pid) AS num_posts,
+            MIN(p.pid) AS min_pid,
+            MAX(p.pid) AS max_pid
+ FROM       mybb_threads t
+ INNER JOIN mybb_posts p  ON t.tid = p.tid
+ INNER JOIN mybb_forums f ON f.fid = t.fid
+ INNER JOIN mybb_users uthr ON uthr.uid = t.uid
+ WHERE      $conds
+ GROUP BY   p.tid
+ ORDER BY   count(p.pid) DESC";
+	$res = $db->query($inner_sql);
+	$tot_rows = $db->affected_rows();
+
 	$sql = "
 SELECT mainq.tid,
        mainq.thread_subject,
@@ -119,28 +145,12 @@ SELECT mainq.tid,
        pmax.dateline AS max_dateline,
        umax.username AS max_username
 FROM
-(SELECT     t.tid,
-            t.subject AS thread_subject,
-            t.dateline AS thread_dateline,
-            uthr.uid AS thread_uid,
-            uthr.username AS thread_username,
-            f.parentlist,
-            f.fid,
-            f.name AS forum_name,
-            count(p.pid) AS num_posts,
-            MIN(p.pid) AS min_pid,
-            MAX(p.pid) AS max_pid
- FROM       mybb_threads t
- INNER JOIN mybb_posts p  ON t.tid = p.tid
- INNER JOIN mybb_forums f ON f.fid = t.fid
- INNER JOIN mybb_users uthr ON uthr.uid = t.uid
- WHERE      $conds
- GROUP BY   p.tid
- ORDER BY   count(p.pid) DESC) AS mainq
+($inner_sql) AS mainq
 INNER JOIN mybb_posts pmax ON mainq.max_pid = pmax.pid
 INNER JOIN mybb_users umax ON umax.uid      = pmax.uid
 INNER JOIN mybb_posts pmin ON mainq.min_pid = pmin.pid
-INNER JOIN mybb_users umin ON umin.uid      = pmin.uid";
+INNER JOIN mybb_users umin ON umin.uid      = pmin.uid
+LIMIT ".(($page-1) * PRT_ITEMS_PER_PAGE).", ".PRT_ITEMS_PER_PAGE;
 
 	$res = $db->query($sql);
 	$rows = $forum_names = array();
@@ -173,7 +183,7 @@ INNER JOIN mybb_users umin ON umin.uid      = pmin.uid";
 	foreach ($rows as $row) {
 		$i = 1 - $i;
 		if (!$html) {
-			$lang_pop_recent_threads_title = $lang->sprintf($lang->prt_pop_recent_threads_title, $days, $hours, $mins, $secs, $date_for_title);
+			$lang_pop_recent_threads_title = $lang->sprintf($lang->prt_pop_recent_threads_title, $days, $hours, $mins, $secs, $date_prior, $date_for_title);
 			$html =<<<EOF
 <table class="tborder tfixed clear">
 	<thead>
@@ -208,11 +218,12 @@ EOF;
 	$prt_before_date_tooltip = htmlspecialchars_uni($lang->prt_before_date_tooltip);
 	$prt_set_period_of_interest_tooltip = htmlspecialchars_uni($lang->prt_set_period_of_interest_tooltip);
 	$prt_set_period_of_interest = htmlspecialchars_uni($lang->prt_set_period_of_interest);
+	$multipage = multipage($tot_rows, PRT_ITEMS_PER_PAGE, $page, "popular_recent_threads.php&days=$days&hours=$hours&mins=$mins&secs=$secs&date=".urlencode($date)."&page={page}");
 	add_breadcrumb($lang->prt_pop_recent_threads_breadcrumb, C_PRT.'.php');
 	output_page(<<<EOF
 <html>
 <head>
-<title>{$mybb->settings['bbname']} - {$lang_pop_recent_threads_title}</title>
+<title>{$mybb->settings['bbname']} - {$lang->prt_pop_recent_threads_title_short}</title>
 {$headerinclude}
 <style type="text/css">
 table, td, th {
@@ -250,7 +261,9 @@ table, td, th {
 	</tbody>
 </table>
 </form>
+{$multipage}
 {$html}
+{$multipage}
 {$footer}
 </body>
 </html>
