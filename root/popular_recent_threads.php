@@ -172,6 +172,7 @@ EOF;
 	if ($html) {
 		$html .= '</tbody></table>';
 	}
+	add_breadcrumb($lang->prt_pop_recent_threads_breadcrumb, C_PRT.'.php');
 	output_page(<<<EOF
 <html>
 <head>

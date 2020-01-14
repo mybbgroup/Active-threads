@@ -7,3 +7,4 @@ $l['prt_cont_forum'      ] = 'Containing forum';
 $l['prt_earliest_posting'] = 'Earliest post during this period';
 $l['prt_latest_posting'  ] = 'Latest post during this period';
 $l['prt_pop_recent_threads_title'] = 'Most Posted-To Threads During The Last {1} Days';
+$l['prt_pop_recent_threads_breadcrumb'] = 'Recently popular threads';
