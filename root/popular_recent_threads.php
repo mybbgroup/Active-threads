@@ -45,7 +45,32 @@ if (!is_array($plugins_cache)) {
 $active_plugins = $plugins_cache['active'];
 
 if ($active_plugins && $active_plugins['popular_recent_threads']) {
-	$conds = 'p.dateline >= UNIX_TIMESTAMP() - 60*60*24*'.PRT_NUM_DAYS;
+	$days = $mybb->get_input('days', MyBB::INPUT_INT);
+	$hours = $mybb->get_input('hours', MyBB::INPUT_INT);
+	$mins = $mybb->get_input('mins', MyBB::INPUT_INT);
+	$secs = $mybb->get_input('secs', MyBB::INPUT_INT);
+	$date = $mybb->get_input('date');
+
+	if ($days == 0 && $hours == 0 && $mins == 0 && $secs == 0) {
+		$days = PRT_NUM_DAYS;
+	}
+
+	$secs_before = $days;
+	$secs_before = $secs_before * 24 + $hours;
+	$secs_before = $secs_before * 60 + $mins;
+	$secs_before = $secs_before * 60 + $secs;
+
+	if ($date) {
+		$ts_epoch = strtotime($date);
+		$date_for_title = $date;
+	} else {
+		$ts_epoch = TIME_NOW;
+		$date = 'Now';
+		$date_for_title = $lang->prt_now;
+	}
+
+	$conds = 'p.dateline >= '.($ts_epoch - $secs_before).' AND p.dateline <= '.$ts_epoch;
+
 	// Make sure the user only sees threads and (counts of) posts s/he is allowed to see.
 	$fids = get_unviewable_forums(true);
 	if ($inact_fids = get_inactive_forums()) {
@@ -142,7 +167,7 @@ INNER JOIN mybb_users umin ON umin.uid      = pmin.uid";
 	foreach ($rows as $row) {
 		$i = 1 - $i;
 		if (!$html) {
-			$lang_pop_recent_threads_title = $lang->sprintf($lang->prt_pop_recent_threads_title, PRT_NUM_DAYS);
+			$lang_pop_recent_threads_title = $lang->sprintf($lang->prt_pop_recent_threads_title, $days, $hours, $mins, $secs, $date_for_title);
 			$html =<<<EOF
 <table class="tborder tfixed clear">
 	<thead>
@@ -171,7 +196,12 @@ EOF;
 
 	if ($html) {
 		$html .= '</tbody></table>';
+	} else {
+		$html = '<p style="text-align: center">'.$lang->prt_no_results.'</p>';
 	}
+	$prt_before_date_tooltip = htmlspecialchars_uni($lang->prt_before_date_tooltip);
+	$prt_set_period_of_interest_tooltip = htmlspecialchars_uni($lang->prt_set_period_of_interest_tooltip);
+	$prt_set_period_of_interest = htmlspecialchars_uni($lang->prt_set_period_of_interest);
 	add_breadcrumb($lang->prt_pop_recent_threads_breadcrumb, C_PRT.'.php');
 	output_page(<<<EOF
 <html>
@@ -179,20 +209,41 @@ EOF;
 <title>{$mybb->settings['bbname']} - {$lang_pop_recent_threads_title}</title>
 {$headerinclude}
 <style type="text/css">
-/**/
 table, td, th {
 	text-align: center;
-	margin: 0;
-	border-width: 0;
 	border-spacing: 0;
-/*	border-collapse: collapse;
-	border: 1px solid grey;*/
 }
-/**/
 </style>
 </head>
 <body>
 {$header}
+<form method="get" action="popular_recent_threads.php">
+<table class="tborder tfixed clear">
+	<thead>
+		<tr>
+			<th class="thead" colspan="6" title="{$prt_set_period_of_interest_tooltip}">{$prt_set_period_of_interest}</td>
+		</tr>
+		<tr>
+			<th class="tcat">{$lang->prt_num_days}</th>
+			<th class="tcat">{$lang->prt_num_hours}</th>
+			<th class="tcat">{$lang->prt_num_mins}</th>
+			<th class="tcat">{$lang->prt_num_secs}</th>
+			<th class="tcat" title="{$prt_before_date_tooltip}">{$lang->prt_before_date}</th>
+			<th class="tcat"></th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><input type="text" name="days" value="$days" style="text-align: right;"/></td>
+			<td><input type="text" name="hours" value="$hours" style="text-align: right;" /></td>
+			<td><input type="text" name="mins" value="$mins" style="text-align: right;" /></td>
+			<td><input type="text" name="secs" value="$secs" style="text-align: right;" /></td>
+			<td><input type="text" name="date" value="$date" title="{$prt_before_date_tooltip}" /></td>
+			<td><input type="submit" name="go" value="{$lang->prt_go}" /></td>
+		</tr>
+	</tbody>
+</table>
+</form>
 {$html}
 {$footer}
 </body>
