@@ -20,10 +20,10 @@ function popular_recent_threads_info() {
 		'website'       => '',
 		'author'        => 'Laird Shaw',
 		'authorsite'    => '',
-		'version'       => '0.0.1',
+		'version'       => '0.0.2',
 		// Constructed by converting each digit of 'version' above into two digits (zero-padded if necessary),
 		// then concatenating them, then removing any leading zero(es) to avoid the value being interpreted as octal.
-		'version_code'  => '1',
+		'version_code'  => '2',
 		'guid'          => '',
 		'codename'      => C_PRT,
 		'compatibility' => '18*'
@@ -33,9 +33,17 @@ function popular_recent_threads_info() {
 }
 
 function popular_recent_threads_install() {
-	global $mybb, $db, $lang;
+	global $mybb, $db, $lang, $cache;
 
 	$lang->load(C_PRT);
+
+	$info = popular_recent_threads_info();
+	$lrs_plugins = $cache->read('lrs_plugins');
+	$lrs_plugins[C_PRT] = array(
+		'version'      => $info['version'     ],
+		'version_code' => $info['version_code'],
+	);
+	$cache->update('lrs_plugins', $lrs_plugins);
 
 	$res = $db->simple_select('settinggroups', 'MAX(disporder) as max_disporder');
 	$disporder = $db->fetch_field($res, 'max_disporder') + 1;
@@ -186,7 +194,7 @@ table, td, th {
 }
 
 function popular_recent_threads_uninstall() {
-	global $db;
+	global $db, $cache;
 
 	$db->delete_query('templates', "title LIKE 'popularrecentthreads_%'");
 	$db->delete_query('templategroups', "prefix in ('popularrecentthreads')");
@@ -198,6 +206,10 @@ function popular_recent_threads_uninstall() {
 		$db->delete_query('settings', "gid='{$group['gid']}'");
 		rebuild_settings();
 	}
+
+	$lrs_plugins = $cache->read('lrs_plugins');
+	unset($lrs_plugins[C_PRT]);
+	$cache->update('lrs_plugins', $lrs_plugins);
 }
 
 function popular_recent_threads_is_installed() {
