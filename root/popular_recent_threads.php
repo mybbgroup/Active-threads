@@ -175,7 +175,7 @@ EOF;
 	output_page(<<<EOF
 <html>
 <head>
-<title>{$mybb->settings['bbname']} - {$lang->prt_pop_recent_threads_title}</title>
+<title>{$mybb->settings['bbname']} - {$lang_pop_recent_threads_title}</title>
 {$headerinclude}
 <style type="text/css">
 /**/
