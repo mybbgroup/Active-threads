@@ -32,7 +32,7 @@ function popular_recent_threads_info() {
 		'website'       => '',
 		'author'        => 'Laird Shaw',
 		'authorsite'    => '',
-		'version'       => '1.0.0',
+		'version'       => '1.0.0-dev',
 		// Constructed by converting each digit of 'version' above into two digits (zero-padded if necessary),
 		// then concatenating them, then removing any leading zero(es) to avoid the value being interpreted as octal.
 		'version_code'  => '10000',
@@ -125,7 +125,7 @@ table, td, th {
 			<th class="tcat">{$lang->prt_num_hours}</th>
 			<th class="tcat">{$lang->prt_num_mins}</th>
 			<th class="tcat">{$lang->prt_num_secs}</th>
-			<th class="tcat" title="{$prt_before_date_tooltip}">{$lang->prt_before_date}</th>
+			<th class="tcat" title="{$prt_before_date_tooltip}">{$lang->prt_before_date} [*]</th>
 			<th class="tcat">{$lang->prt_sort_by}</th>
 		</tr>
 	</thead>
@@ -149,7 +149,7 @@ table, td, th {
 		</tr>
 	</tbody>
 </table>
-<p style="text-align: center"><input type="submit" name="go" value="{$lang->prt_go}" class="button" /></p>
+<p style="text-align: center">[*] {$lang->prt_before_date_footnote}<br /><input type="submit" name="go" value="{$lang->prt_go}" class="button" /></p>
 </form>
 {$footer}
 </body>

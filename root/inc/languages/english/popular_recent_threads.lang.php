@@ -17,6 +17,7 @@ $l['prt_num_mins'        ] = 'Minutes';
 $l['prt_num_secs'        ] = 'Seconds';
 $l['prt_before_date'     ] = 'Before this date-time';
 $l['prt_before_date_tooltip'] = 'Use a recognisable format such as "2019-01-15 13:08", or leave blank to indicate "now".';
+$l['prt_before_date_footnote'] = 'Use a recognisable format such as "2019-01-15 13:08", or leave blank to indicate "now". For a comprehensive listing of accepted formats, see <a href="https://www.php.net/manual/en/datetime.formats.php">Supported Date and Time Formats</a> in the PHP manual.';
 $l['prt_sort_by'         ] = 'Sort by';
 $l['prt_asc'             ] = 'ascending order';
 $l['prt_desc'            ] = 'descending order';
