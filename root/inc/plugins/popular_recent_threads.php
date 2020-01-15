@@ -111,6 +111,9 @@ table, td, th {
 </head>
 <body>
 {$header}
+{$multipage}
+{$results_html}
+{$multipage}
 <form method="get" action="popular_recent_threads.php">
 <table class="tborder tfixed clear">
 	<thead>
@@ -123,7 +126,7 @@ table, td, th {
 			<th class="tcat">{$lang->prt_num_mins}</th>
 			<th class="tcat">{$lang->prt_num_secs}</th>
 			<th class="tcat" title="{$prt_before_date_tooltip}">{$lang->prt_before_date}</th>
-			<th class="tcat"></th>
+			<th class="tcat">{$lang->prt_sort_by}</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -132,15 +135,22 @@ table, td, th {
 			<td><input type="text" name="hours" value="$hours" size="5" style="text-align: right;" /></td>
 			<td><input type="text" name="mins" value="$mins" size="5" style="text-align: right;" /></td>
 			<td><input type="text" name="secs" value="$secs" size="5" style="text-align: right;" /></td>
-			<td><input type="text" name="date" value="$date" style="text-align: right;" title="{$prt_before_date_tooltip}" /></td>
-			<td><input type="submit" name="go" value="{$lang->prt_go}" class="button" /></td>
+			<td><input type="text" name="date" value="$date" size="16" style="text-align: right;" title="{$prt_before_date_tooltip}" /></td>
+			<td>
+				<input type="radio" name="order" value="ascending" id="sort.asc"{$asc_checked} /><label for ="sort.asc">{$lang->prt_asc}</label><br />
+				<input type="radio" name="order" value="descending" id="sort.desc"{$desc_checked} /><label for ="sort.desc">{$lang->prt_desc}</label>
+				<br />
+				<select name="sort">
+					<option value="num_posts"$num_posts_selected>{$lang->prt_sort_by_num_posts}</option>
+					<option value="min_dateline"$min_dateline_selected>{$lang->prt_sort_by_earliest}</option>
+					<option value="max_dateline"$max_dateline_selected>{$lang->prt_sort_by_latest}</option>
+				</select>
+			</td>
 		</tr>
 	</tbody>
 </table>
+<p style="text-align: center"><input type="submit" name="go" value="{$lang->prt_go}" class="button" /></p>
 </form>
-{$multipage}
-{$results_html}
-{$multipage}
 {$footer}
 </body>
 </html>',

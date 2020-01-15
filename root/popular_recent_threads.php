@@ -227,7 +227,7 @@ LIMIT ".(($page-1) * PRT_ITEMS_PER_PAGE).", ".PRT_ITEMS_PER_PAGE;
 		$sorter = ' [<a href="'.prt_make_url($days, $hours, $mins, $secs, $date, $sort, ($order == 'ascending' ? 'descending' : 'ascending'), $page).'">'.($order == 'ascending' ? 'desc' : 'asc').'</a>]';
 		$num_posts_heading    = '<a href="'.prt_make_url($days, $hours, $mins, $secs, $date, 'num_posts', 'descending', $page).'">'.$lang->prt_num_posts.'</a>';
 		$min_dateline_heading = '<a href="'.prt_make_url($days, $hours, $mins, $secs, $date, 'min_dateline', 'descending', $page).'">'.$lang->prt_earliest_posting.'</a>';
-		$max_dateline_heading = '<a href="'.prt_make_url($days, $hours, $mins, $secs, $date, 'max_dateline', 'descending', $page).'">'.$lang->prt_earliest_posting.'</a>';
+		$max_dateline_heading = '<a href="'.prt_make_url($days, $hours, $mins, $secs, $date, 'max_dateline', 'descending', $page).'">'.$lang->prt_latest_posting.'</a>';
 		switch ($sort) {
 		case 'num_posts':
 			$num_posts_heading    = $lang->prt_num_posts.$sorter;
@@ -240,6 +240,11 @@ LIMIT ".(($page-1) * PRT_ITEMS_PER_PAGE).", ".PRT_ITEMS_PER_PAGE;
 			break;
 		}
 		$lang_pop_recent_threads_title = $lang->sprintf($lang->prt_pop_recent_threads_title, $days, $hours, $mins, $secs, $date_prior, $date_for_title);
+		$asc_checked           = ($order == 'ascending'    ? ' checked="checked"'   : '');
+		$desc_checked          = ($order == 'descending'   ? ' checked="checked"'   : '');
+		$num_posts_selected    = ($sort  == 'num_posts'    ? ' selected="selected"' : '');
+		$min_dateline_selected = ($sort  == 'min_dateline' ? ' selected="selected"' : '');
+		$max_dateline_selected = ($sort  == 'max_dateline' ? ' selected="selected"' : '');
 		eval("\$results_html = \"".$templates->get('popularrecentthreads_results', 1, 0)."\";");
 
 	} else {
