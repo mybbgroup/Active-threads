@@ -3,45 +3,45 @@
 define('IN_MYBB', 1);
 require_once './global.php';
 
-define('PRT_NUM_DAYS', 14);
-define('PRT_ITEMS_PER_PAGE', 20);
+define('ACT_NUM_DAYS', 14);
+define('ACT_ITEMS_PER_PAGE', 20);
 
-if (!isset($lang->popular_recent_threads)) {
-	$lang->load('popular_recent_threads');
+if (!isset($lang->activethreads)) {
+	$lang->load('activethreads');
 }
 
-function prt_get_link($url, $text) {
+function act_get_link($url, $text) {
 	return '<a href="'.htmlspecialchars_uni($url).'">'.htmlspecialchars_uni($text).'</a>';
 }
 
-function prt_get_forumlink($fid, $name) {
-	return prt_get_link(get_forum_link($fid), $name);
+function act_get_forumlink($fid, $name) {
+	return act_get_link(get_forum_link($fid), $name);
 }
 
-function prt_get_threadlink($tid, $name) {
-	return prt_get_link(get_thread_link($tid), $name);
+function act_get_threadlink($tid, $name) {
+	return act_get_link(get_thread_link($tid), $name);
 }
 
-function prt_get_usernamelink($uid, $name) {
-	return prt_get_link(get_profile_link($uid), $name);
+function act_get_usernamelink($uid, $name) {
+	return act_get_link(get_profile_link($uid), $name);
 }
 
-function prt_get_postlink($pid, $name) {
-	return prt_get_link(get_post_link($pid).'#pid'.$pid, $name);
+function act_get_postlink($pid, $name) {
+	return act_get_link(get_post_link($pid).'#pid'.$pid, $name);
 }
 
-function prt_get_flinks($parentlist, $forum_names) {
+function act_get_flinks($parentlist, $forum_names) {
 	$flinks = '';
 	foreach (explode(',', $parentlist) as $fid) {
 		if ($flinks ) $flinks .= ' &raquo; ';
-		$flinks .= prt_get_forumlink($fid, $forum_names[$fid]);
+		$flinks .= act_get_forumlink($fid, $forum_names[$fid]);
 	}
 
 	return $flinks;
 }
 
-function prt_make_url($days, $hours, $mins, $secs, $date, $sort, $order, $page) {
-	return "popular_recent_threads.php&days=$days&hours=$hours&mins=$mins&secs=$secs&date=".urlencode($date)."&sort=$sort&order=$order&page=$page";
+function act_make_url($days, $hours, $mins, $secs, $date, $sort, $order, $page) {
+	return "activethreads.php&days=$days&hours=$hours&mins=$mins&secs=$secs&date=".urlencode($date)."&sort=$sort&order=$order&page=$page";
 }
 
 if (!is_array($plugins_cache)) {
@@ -49,8 +49,8 @@ if (!is_array($plugins_cache)) {
 }
 $active_plugins = $plugins_cache['active'];
 
-if ($active_plugins && $active_plugins['popular_recent_threads']) {
-	$max_interval = $mybb->settings[C_PRT.'_max_interval_in_secs'];
+if ($active_plugins && $active_plugins['activethreads']) {
+	$max_interval = $mybb->settings[C_ACT.'_max_interval_in_secs'];
 
 	$days = $mybb->get_input('days', MyBB::INPUT_INT);
 	$hours = $mybb->get_input('hours', MyBB::INPUT_INT);
@@ -74,9 +74,9 @@ if ($active_plugins && $active_plugins['popular_recent_threads']) {
 	}
 
 	if ($days == 0 && $hours == 0 && $mins == 0 && $secs == 0) {
-		if ($max_interval > 0 && PRT_NUM_DAYS * 24*60*60 > $max_interval) {
+		if ($max_interval > 0 && ACT_NUM_DAYS * 24*60*60 > $max_interval) {
 			$secs = $max_interval;
-		} else	$days = PRT_NUM_DAYS;
+		} else	$days = ACT_NUM_DAYS;
 	}
 	if (!$page) $page = 1;
 
@@ -97,12 +97,12 @@ if ($active_plugins && $active_plugins['popular_recent_threads']) {
 	} else {
 		$ts_epoch = TIME_NOW;
 		$date = 'Now';
-		$date_for_title = $lang->prt_now;
+		$date_for_title = $lang->act_now;
 	}
 	$date_prior = my_date('normal', $ts_epoch - $secs_before);
 
 	if ($max_interval > 0 && $secs_before > $max_interval) {
-		error($lang->sprintf($lang->prt_err_excess_int, $secs_before, $max_interval));
+		error($lang->sprintf($lang->act_err_excess_int, $secs_before, $max_interval));
 	}
 
 	$conds = 'p.dateline >= '.($ts_epoch - $secs_before).' AND p.dateline <= '.$ts_epoch;
@@ -178,7 +178,7 @@ INNER JOIN mybb_users umax ON umax.uid      = pmax.uid
 INNER JOIN mybb_posts pmin ON mainq.min_pid = pmin.pid
 INNER JOIN mybb_users umin ON umin.uid      = pmin.uid
 ORDER BY   $order_by
-LIMIT ".(($page-1) * PRT_ITEMS_PER_PAGE).", ".PRT_ITEMS_PER_PAGE;
+LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 
 	$res = $db->query($sql);
 	$rows = $forum_names = array();
@@ -212,49 +212,49 @@ LIMIT ".(($page-1) * PRT_ITEMS_PER_PAGE).", ".PRT_ITEMS_PER_PAGE;
 		foreach ($rows as $row) {
 			$i = 1 - $i;
 			$bgcolor = 'trow'.($i+1);
-			$thread_link = prt_get_threadlink($row['tid'], $row['thread_subject']);
-			$thread_username_link = prt_get_usernamelink($row['thread_uid'], $row['thread_username']);
+			$thread_link = act_get_threadlink($row['tid'], $row['thread_subject']);
+			$thread_username_link = act_get_usernamelink($row['thread_uid'], $row['thread_username']);
 			$thread_date = my_date('normal', $row['thread_dateline']);
 			$num_posts_fmt = my_number_format($row['num_posts']);
-			$forum_links = prt_get_flinks($row['parentlist'], $forum_names);
-			$min_post_date_link = prt_get_postlink($row['min_pid'], my_date('normal', $row['min_dateline']));
-			$min_post_username_link = prt_get_usernamelink($row['min_uid'], $row['min_username']);
-			$max_post_date_link = prt_get_postlink($row['max_pid'], my_date('normal', $row['max_dateline']));
-			$max_post_username_link = prt_get_usernamelink($row['max_uid'], $row['max_username']);
-			eval("\$result_rows .= \"".$templates->get('popularrecentthreads_result_row', 1, 0)."\";");
+			$forum_links = act_get_flinks($row['parentlist'], $forum_names);
+			$min_post_date_link = act_get_postlink($row['min_pid'], my_date('normal', $row['min_dateline']));
+			$min_post_username_link = act_get_usernamelink($row['min_uid'], $row['min_username']);
+			$max_post_date_link = act_get_postlink($row['max_pid'], my_date('normal', $row['max_dateline']));
+			$max_post_username_link = act_get_usernamelink($row['max_uid'], $row['max_username']);
+			eval("\$result_rows .= \"".$templates->get('activethreads_result_row', 1, 0)."\";");
 		}
 
-		$sorter = ' [<a href="'.prt_make_url($days, $hours, $mins, $secs, $date, $sort, ($order == 'ascending' ? 'descending' : 'ascending'), $page).'">'.($order == 'ascending' ? 'desc' : 'asc').'</a>]';
-		$num_posts_heading    = '<a href="'.prt_make_url($days, $hours, $mins, $secs, $date, 'num_posts', 'descending', $page).'">'.$lang->prt_num_posts.'</a>';
-		$min_dateline_heading = '<a href="'.prt_make_url($days, $hours, $mins, $secs, $date, 'min_dateline', 'descending', $page).'">'.$lang->prt_earliest_posting.'</a>';
-		$max_dateline_heading = '<a href="'.prt_make_url($days, $hours, $mins, $secs, $date, 'max_dateline', 'descending', $page).'">'.$lang->prt_latest_posting.'</a>';
+		$sorter = ' [<a href="'.act_make_url($days, $hours, $mins, $secs, $date, $sort, ($order == 'ascending' ? 'descending' : 'ascending'), $page).'">'.($order == 'ascending' ? 'desc' : 'asc').'</a>]';
+		$num_posts_heading    = '<a href="'.act_make_url($days, $hours, $mins, $secs, $date, 'num_posts', 'descending', $page).'">'.$lang->act_num_posts.'</a>';
+		$min_dateline_heading = '<a href="'.act_make_url($days, $hours, $mins, $secs, $date, 'min_dateline', 'descending', $page).'">'.$lang->act_earliest_posting.'</a>';
+		$max_dateline_heading = '<a href="'.act_make_url($days, $hours, $mins, $secs, $date, 'max_dateline', 'descending', $page).'">'.$lang->act_latest_posting.'</a>';
 		switch ($sort) {
 		case 'num_posts':
-			$num_posts_heading    = $lang->prt_num_posts.$sorter;
+			$num_posts_heading    = $lang->act_num_posts.$sorter;
 			break;
 		case 'min_dateline':
-			$min_dateline_heading = $lang->prt_earliest_posting.$sorter;
+			$min_dateline_heading = $lang->act_earliest_posting.$sorter;
 			break;
 		case 'max_dateline':
-			$max_dateline_heading = $lang->prt_latest_posting.$sorter;
+			$max_dateline_heading = $lang->act_latest_posting.$sorter;
 			break;
 		}
-		$lang_pop_recent_threads_title = $lang->sprintf($lang->prt_pop_recent_threads_title, $days, $hours, $mins, $secs, $date_prior, $date_for_title);
+		$lang_act_recent_threads_title = $lang->sprintf($lang->act_act_recent_threads_title, $days, $hours, $mins, $secs, $date_prior, $date_for_title);
 		$asc_checked           = ($order == 'ascending'    ? ' checked="checked"'   : '');
 		$desc_checked          = ($order == 'descending'   ? ' checked="checked"'   : '');
 		$num_posts_selected    = ($sort  == 'num_posts'    ? ' selected="selected"' : '');
 		$min_dateline_selected = ($sort  == 'min_dateline' ? ' selected="selected"' : '');
 		$max_dateline_selected = ($sort  == 'max_dateline' ? ' selected="selected"' : '');
-		eval("\$results_html = \"".$templates->get('popularrecentthreads_results', 1, 0)."\";");
+		eval("\$results_html = \"".$templates->get('activethreads_results', 1, 0)."\";");
 
 	} else {
-		$results_html = '<p style="text-align: center">'.$lang->prt_no_results.'</p>';
+		$results_html = '<p style="text-align: center">'.$lang->act_no_results.'</p>';
 	}
-	$prt_before_date_tooltip = htmlspecialchars_uni($lang->prt_before_date_tooltip);
-	$prt_set_period_of_interest_tooltip = htmlspecialchars_uni($lang->prt_set_period_of_interest_tooltip);
-	$prt_set_period_of_interest = htmlspecialchars_uni($lang->prt_set_period_of_interest);
-	$multipage = multipage($tot_rows, PRT_ITEMS_PER_PAGE, $page, prt_make_url($days, $hours, $mins, $secs, $date, $sort, $order, '{page}'));
-	add_breadcrumb($lang->prt_pop_recent_threads_breadcrumb, C_PRT.'.php');
-	eval("\$html = \"".$templates->get('popularrecentthreads_page', 1, 0)."\";");
+	$act_before_date_tooltip = htmlspecialchars_uni($lang->act_before_date_tooltip);
+	$act_set_period_of_interest_tooltip = htmlspecialchars_uni($lang->act_set_period_of_interest_tooltip);
+	$act_set_period_of_interest = htmlspecialchars_uni($lang->act_set_period_of_interest);
+	$multipage = multipage($tot_rows, ACT_ITEMS_PER_PAGE, $page, act_make_url($days, $hours, $mins, $secs, $date, $sort, $order, '{page}'));
+	add_breadcrumb($lang->act_act_recent_threads_breadcrumb, C_ACT.'.php');
+	eval("\$html = \"".$templates->get('activethreads_page', 1, 0)."\";");
 	output_page($html);
-} else	echo $lang->prt_inactive;
+} else	echo $lang->act_inactive;
