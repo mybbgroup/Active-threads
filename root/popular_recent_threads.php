@@ -40,6 +40,10 @@ function prt_get_flinks($parentlist, $forum_names) {
 	return $flinks;
 }
 
+function prt_make_url($days, $hours, $mins, $secs, $date, $sort, $order, $page) {
+	return "popular_recent_threads.php&days=$days&hours=$hours&mins=$mins&secs=$secs&date=".urlencode($date)."&sort=$sort&order=$order&page=$page";
+}
+
 if (!is_array($plugins_cache)) {
 	$plugins_cache = $cache->read('plugins');
 }
@@ -54,6 +58,20 @@ if ($active_plugins && $active_plugins['popular_recent_threads']) {
 	$secs = $mybb->get_input('secs', MyBB::INPUT_INT);
 	$date = $mybb->get_input('date');
 	$page = $mybb->get_input('page', MyBB::INPUT_INT);
+	$sort = $mybb->get_input('sort');
+	$order = $mybb->get_input('order');
+
+	switch ($sort) {
+	case 'min_dateline':
+	case 'max_dateline':
+		break;
+	default:
+		$sort = 'num_posts';
+	}
+
+	if ($order != 'ascending') {
+		$order = 'descending';
+	}
 
 	if ($days == 0 && $hours == 0 && $mins == 0 && $secs == 0) {
 		if ($max_interval > 0 && PRT_NUM_DAYS * 24*60*60 > $max_interval) {
@@ -127,10 +145,11 @@ if ($active_plugins && $active_plugins['popular_recent_threads']) {
  INNER JOIN mybb_forums f ON f.fid = t.fid
  INNER JOIN mybb_users uthr ON uthr.uid = t.uid
  WHERE      $conds
- GROUP BY   p.tid
- ORDER BY   count(p.pid) DESC";
+ GROUP BY   p.tid";
 	$res = $db->query($inner_sql);
 	$tot_rows = $db->affected_rows();
+
+	$order_by = $sort.' '.($order == 'descending' ? 'DESC' : 'ASC');
 
 	$sql = "
 SELECT mainq.tid,
@@ -158,6 +177,7 @@ INNER JOIN mybb_posts pmax ON mainq.max_pid = pmax.pid
 INNER JOIN mybb_users umax ON umax.uid      = pmax.uid
 INNER JOIN mybb_posts pmin ON mainq.min_pid = pmin.pid
 INNER JOIN mybb_users umin ON umin.uid      = pmin.uid
+ORDER BY   $order_by
 LIMIT ".(($page-1) * PRT_ITEMS_PER_PAGE).", ".PRT_ITEMS_PER_PAGE;
 
 	$res = $db->query($sql);
@@ -204,6 +224,21 @@ LIMIT ".(($page-1) * PRT_ITEMS_PER_PAGE).", ".PRT_ITEMS_PER_PAGE;
 			eval("\$result_rows .= \"".$templates->get('popularrecentthreads_result_row', 1, 0)."\";");
 		}
 
+		$sorter = ' [<a href="'.prt_make_url($days, $hours, $mins, $secs, $date, $sort, ($order == 'ascending' ? 'descending' : 'ascending'), $page).'">'.($order == 'ascending' ? 'desc' : 'asc').'</a>]';
+		$num_posts_heading    = '<a href="'.prt_make_url($days, $hours, $mins, $secs, $date, 'num_posts', 'descending', $page).'">'.$lang->prt_num_posts.'</a>';
+		$min_dateline_heading = '<a href="'.prt_make_url($days, $hours, $mins, $secs, $date, 'min_dateline', 'descending', $page).'">'.$lang->prt_earliest_posting.'</a>';
+		$max_dateline_heading = '<a href="'.prt_make_url($days, $hours, $mins, $secs, $date, 'max_dateline', 'descending', $page).'">'.$lang->prt_earliest_posting.'</a>';
+		switch ($sort) {
+		case 'num_posts':
+			$num_posts_heading    = $lang->prt_num_posts.$sorter;
+			break;
+		case 'min_dateline':
+			$min_dateline_heading = $lang->prt_earliest_posting.$sorter;
+			break;
+		case 'max_dateline':
+			$max_dateline_heading = $lang->prt_latest_posting.$sorter;
+			break;
+		}
 		$lang_pop_recent_threads_title = $lang->sprintf($lang->prt_pop_recent_threads_title, $days, $hours, $mins, $secs, $date_prior, $date_for_title);
 		eval("\$results_html = \"".$templates->get('popularrecentthreads_results', 1, 0)."\";");
 
@@ -213,7 +248,7 @@ LIMIT ".(($page-1) * PRT_ITEMS_PER_PAGE).", ".PRT_ITEMS_PER_PAGE;
 	$prt_before_date_tooltip = htmlspecialchars_uni($lang->prt_before_date_tooltip);
 	$prt_set_period_of_interest_tooltip = htmlspecialchars_uni($lang->prt_set_period_of_interest_tooltip);
 	$prt_set_period_of_interest = htmlspecialchars_uni($lang->prt_set_period_of_interest);
-	$multipage = multipage($tot_rows, PRT_ITEMS_PER_PAGE, $page, "popular_recent_threads.php&days=$days&hours=$hours&mins=$mins&secs=$secs&date=".urlencode($date)."&page={page}");
+	$multipage = multipage($tot_rows, PRT_ITEMS_PER_PAGE, $page, prt_make_url($days, $hours, $mins, $secs, $date, $sort, $order, '{page}'));
 	add_breadcrumb($lang->prt_pop_recent_threads_breadcrumb, C_PRT.'.php');
 	eval("\$html = \"".$templates->get('popularrecentthreads_page', 1, 0)."\";");
 	output_page($html);

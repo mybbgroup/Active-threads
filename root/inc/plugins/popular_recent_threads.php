@@ -132,7 +132,7 @@ table, td, th {
 			<td><input type="text" name="hours" value="$hours" size="5" style="text-align: right;" /></td>
 			<td><input type="text" name="mins" value="$mins" size="5" style="text-align: right;" /></td>
 			<td><input type="text" name="secs" value="$secs" size="5" style="text-align: right;" /></td>
-			<td><input type="text" name="date" value="$date" style="text-align: right; /*width: 30px;*/" title="{$prt_before_date_tooltip}" /></td>
+			<td><input type="text" name="date" value="$date" style="text-align: right;" title="{$prt_before_date_tooltip}" /></td>
 			<td><input type="submit" name="go" value="{$lang->prt_go}" class="button" /></td>
 		</tr>
 	</tbody>
@@ -160,10 +160,10 @@ table, td, th {
 	</tr>
 	<tr>
 		<th class="tcat" style="text-align: left;">{$lang->prt_thread_author_start}</th>
-		<th class="tcat">{$lang->prt_num_posts}</th>
+		<th class="tcat">{$num_posts_heading}</th>
 		<th class="tcat">{$lang->prt_cont_forum}</th>
-		<th class="tcat" style="text-align: right;">{$lang->prt_earliest_posting}</th>
-		<th class="tcat" style="text-align: right;">{$lang->prt_latest_posting}</th>
+		<th class="tcat" style="text-align: right;">{$min_dateline_heading}</th>
+		<th class="tcat" style="text-align: right;">{$max_dateline_heading}</th>
 	</tr>
 </thead>
 <tbody>
