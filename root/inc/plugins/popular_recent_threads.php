@@ -20,10 +20,10 @@ function popular_recent_threads_info() {
 		'website'       => '',
 		'author'        => 'Laird Shaw',
 		'authorsite'    => '',
-		'version'       => '0.0.2',
+		'version'       => '0.0.3',
 		// Constructed by converting each digit of 'version' above into two digits (zero-padded if necessary),
 		// then concatenating them, then removing any leading zero(es) to avoid the value being interpreted as octal.
-		'version_code'  => '2',
+		'version_code'  => '3',
 		'guid'          => '',
 		'codename'      => C_PRT,
 		'compatibility' => '18*'
@@ -83,6 +83,7 @@ function popular_recent_threads_install() {
 		$db->insert_query('settings', $insert_settings);
 		$x++;
 	}
+	rebuild_settings();
 
 	// Insert the plugin's templates into the database.
 	$templateset = array(

@@ -56,7 +56,7 @@ if ($active_plugins && $active_plugins['popular_recent_threads']) {
 	$page = $mybb->get_input('page', MyBB::INPUT_INT);
 
 	if ($days == 0 && $hours == 0 && $mins == 0 && $secs == 0) {
-		if (PRT_NUM_DAYS * 24*60*60 > $max_interval) {
+		if ($max_interval > 0 && PRT_NUM_DAYS * 24*60*60 > $max_interval) {
 			$secs = $max_interval;
 		} else	$days = PRT_NUM_DAYS;
 	}
