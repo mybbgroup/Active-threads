@@ -37,14 +37,6 @@ function popular_recent_threads_install() {
 
 	$lang->load(C_PRT);
 
-	$info = popular_recent_threads_info();
-	$lrs_plugins = $cache->read('lrs_plugins');
-	$lrs_plugins[C_PRT] = array(
-		'version'      => $info['version'     ],
-		'version_code' => $info['version_code'],
-	);
-	$cache->update('lrs_plugins', $lrs_plugins);
-
 	$res = $db->simple_select('settinggroups', 'MAX(disporder) as max_disporder');
 	$disporder = $db->fetch_field($res, 'max_disporder') + 1;
 
@@ -218,4 +210,23 @@ function popular_recent_threads_is_installed() {
 
 	$res = $db->simple_select('templates', '*', "title LIKE 'popularrecentthreads_%'");
 	return ($db->affected_rows() > 0);
+}
+
+function popular_recent_threads_activate() {
+	global $cache;
+
+	$lrs_plugins = $cache->read('lrs_plugins');
+	$info = popular_recent_threads_info();
+
+	$old_version_code = $lrs_plugins[C_PRT]['version_code'];
+	$new_version_code = $info['version_code'];
+
+	// In future, any necessary upgrades may be performed when $new_version_code > $old_version_code.
+	// For now, simply update the code in the permanent cache.
+	$lrs_plugins[C_PRT] = array(
+		'version'      => $info['version'     ],
+		'version_code' => $info['version_code'],
+	);
+	$cache->update('lrs_plugins', $lrs_plugins);
+
 }
