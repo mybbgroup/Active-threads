@@ -32,7 +32,7 @@ function popular_recent_threads_info() {
 		'website'       => '',
 		'author'        => 'Laird Shaw',
 		'authorsite'    => '',
-		'version'       => '0.0.4',
+		'version'       => '0.0.4-dev',
 		// Constructed by converting each digit of 'version' above into two digits (zero-padded if necessary),
 		// then concatenating them, then removing any leading zero(es) to avoid the value being interpreted as octal.
 		'version_code'  => '4',
@@ -128,11 +128,11 @@ table, td, th {
 	</thead>
 	<tbody>
 		<tr>
-			<td><input type="text" name="days" value="$days" style="text-align: right;"/></td>
-			<td><input type="text" name="hours" value="$hours" style="text-align: right;" /></td>
-			<td><input type="text" name="mins" value="$mins" style="text-align: right;" /></td>
-			<td><input type="text" name="secs" value="$secs" style="text-align: right;" /></td>
-			<td><input type="text" name="date" value="$date" style="text-align: right;" title="{$prt_before_date_tooltip}" /></td>
+			<td><input type="text" name="days" value="$days" size="5" style="text-align: right;"/></td>
+			<td><input type="text" name="hours" value="$hours" size="5" style="text-align: right;" /></td>
+			<td><input type="text" name="mins" value="$mins" size="5" style="text-align: right;" /></td>
+			<td><input type="text" name="secs" value="$secs" size="5" style="text-align: right;" /></td>
+			<td><input type="text" name="date" value="$date" style="text-align: right; /*width: 30px;*/" title="{$prt_before_date_tooltip}" /></td>
 			<td><input type="submit" name="go" value="{$lang->prt_go}" class="button" /></td>
 		</tr>
 	</tbody>
