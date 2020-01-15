@@ -40,8 +40,8 @@ function act_get_flinks($parentlist, $forum_names) {
 	return $flinks;
 }
 
-function act_make_url($days, $hours, $mins, $secs, $date, $sort, $order, $page) {
-	return "activethreads.php&days=$days&hours=$hours&mins=$mins&secs=$secs&date=".urlencode($date)."&sort=$sort&order=$order&page=$page";
+function act_make_url($days, $hours, $mins, $date, $sort, $order, $page) {
+	return "activethreads.php&days=$days&hours=$hours&mins=$mins&date=".urlencode($date)."&sort=$sort&order=$order&page=$page";
 }
 
 if (!is_array($plugins_cache)) {
@@ -55,7 +55,6 @@ if ($active_plugins && $active_plugins['activethreads']) {
 	$days = $mybb->get_input('days', MyBB::INPUT_INT);
 	$hours = $mybb->get_input('hours', MyBB::INPUT_INT);
 	$mins = $mybb->get_input('mins', MyBB::INPUT_INT);
-	$secs = $mybb->get_input('secs', MyBB::INPUT_INT);
 	$date = $mybb->get_input('date');
 	$page = $mybb->get_input('page', MyBB::INPUT_INT);
 	$sort = $mybb->get_input('sort');
@@ -73,9 +72,9 @@ if ($active_plugins && $active_plugins['activethreads']) {
 		$order = 'descending';
 	}
 
-	if ($days == 0 && $hours == 0 && $mins == 0 && $secs == 0) {
+	if ($days == 0 && $hours == 0 && $mins == 0) {
 		if ($max_interval > 0 && ACT_NUM_DAYS * 24*60*60 > $max_interval) {
-			$secs = $max_interval;
+			$mins = $max_interval * 60;
 		} else	$days = ACT_NUM_DAYS;
 	}
 	if (!$page) $page = 1;
@@ -83,7 +82,7 @@ if ($active_plugins && $active_plugins['activethreads']) {
 	$secs_before = $days;
 	$secs_before = $secs_before * 24 + $hours;
 	$secs_before = $secs_before * 60 + $mins;
-	$secs_before = $secs_before * 60 + $secs;
+	$secs_before = $secs_before * 60;
 
 	if ($date) {
 		if ($mybb->user['dst'] == 1) {
@@ -224,10 +223,10 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 			eval("\$result_rows .= \"".$templates->get('activethreads_result_row', 1, 0)."\";");
 		}
 
-		$sorter = ' [<a href="'.act_make_url($days, $hours, $mins, $secs, $date, $sort, ($order == 'ascending' ? 'descending' : 'ascending'), $page).'">'.($order == 'ascending' ? 'desc' : 'asc').'</a>]';
-		$num_posts_heading    = '<a href="'.act_make_url($days, $hours, $mins, $secs, $date, 'num_posts', 'descending', $page).'">'.$lang->act_num_posts.'</a>';
-		$min_dateline_heading = '<a href="'.act_make_url($days, $hours, $mins, $secs, $date, 'min_dateline', 'descending', $page).'">'.$lang->act_earliest_posting.'</a>';
-		$max_dateline_heading = '<a href="'.act_make_url($days, $hours, $mins, $secs, $date, 'max_dateline', 'descending', $page).'">'.$lang->act_latest_posting.'</a>';
+		$sorter = ' [<a href="'.act_make_url($days, $hours, $mins, $date, $sort, ($order == 'ascending' ? 'descending' : 'ascending'), $page).'">'.($order == 'ascending' ? 'desc' : 'asc').'</a>]';
+		$num_posts_heading    = '<a href="'.act_make_url($days, $hours, $mins, $date, 'num_posts', 'descending', $page).'">'.$lang->act_num_posts.'</a>';
+		$min_dateline_heading = '<a href="'.act_make_url($days, $hours, $mins, $date, 'min_dateline', 'descending', $page).'">'.$lang->act_earliest_posting.'</a>';
+		$max_dateline_heading = '<a href="'.act_make_url($days, $hours, $mins, $date, 'max_dateline', 'descending', $page).'">'.$lang->act_latest_posting.'</a>';
 		switch ($sort) {
 		case 'num_posts':
 			$num_posts_heading    = $lang->act_num_posts.$sorter;
@@ -239,7 +238,7 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 			$max_dateline_heading = $lang->act_latest_posting.$sorter;
 			break;
 		}
-		$lang_act_recent_threads_title = $lang->sprintf($lang->act_act_recent_threads_title, $days, $hours, $mins, $secs, $date_prior, $date_for_title);
+		$lang_act_recent_threads_title = $lang->sprintf($lang->act_act_recent_threads_title, $days, $hours, $mins, $date_prior, $date_for_title);
 		$asc_checked           = ($order == 'ascending'    ? ' checked="checked"'   : '');
 		$desc_checked          = ($order == 'descending'   ? ' checked="checked"'   : '');
 		$num_posts_selected    = ($sort  == 'num_posts'    ? ' selected="selected"' : '');
@@ -253,7 +252,7 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 	$act_before_date_tooltip = htmlspecialchars_uni($lang->act_before_date_tooltip);
 	$act_set_period_of_interest_tooltip = htmlspecialchars_uni($lang->act_set_period_of_interest_tooltip);
 	$act_set_period_of_interest = htmlspecialchars_uni($lang->act_set_period_of_interest);
-	$multipage = multipage($tot_rows, ACT_ITEMS_PER_PAGE, $page, act_make_url($days, $hours, $mins, $secs, $date, $sort, $order, '{page}'));
+	$multipage = multipage($tot_rows, ACT_ITEMS_PER_PAGE, $page, act_make_url($days, $hours, $mins, $date, $sort, $order, '{page}'));
 	add_breadcrumb($lang->act_act_recent_threads_breadcrumb, C_ACT.'.php');
 	eval("\$html = \"".$templates->get('activethreads_page', 1, 0)."\";");
 	output_page($html);

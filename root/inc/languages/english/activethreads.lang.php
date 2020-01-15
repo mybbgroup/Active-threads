@@ -6,7 +6,7 @@ $l['act_num_posts'       ] = 'Number of posts during this period';
 $l['act_cont_forum'      ] = 'Containing forum';
 $l['act_earliest_posting'] = 'Earliest post during this period';
 $l['act_latest_posting'  ] = 'Latest post during this period';
-$l['act_act_recent_threads_title'] = 'Active Threads During The {1} Days {2} Hours {3} Minutes {4} Seconds Between {5} And {6}';
+$l['act_act_recent_threads_title'] = 'Active Threads During The {1} Days {2} Hours {3} Minutes Between {4} And {5}';
 $l['act_act_recent_threads_title_short'] = 'Most Active Threads';
 $l['act_act_recent_threads_breadcrumb'] = 'Active threads';
 $l['act_set_period_of_interest'] = 'Set the period of interest';
@@ -14,7 +14,6 @@ $l['act_set_period_of_interest_tooltip'] = 'Specify the period as the number of 
 $l['act_num_days'        ] = 'Days';
 $l['act_num_hours'       ] = 'Hours';
 $l['act_num_mins'        ] = 'Minutes';
-$l['act_num_secs'        ] = 'Seconds';
 $l['act_before_date'     ] = 'Before this date-time';
 $l['act_before_date_tooltip'] = 'Use a recognisable format such as "2019-01-15 13:08", or leave blank to indicate "now".';
 $l['act_before_date_footnote'] = 'Use a recognisable format such as "2019-01-15 13:08", or leave blank to indicate "now". For a comprehensive listing of accepted formats, see <a href="https://www.php.net/manual/en/datetime.formats.php">Supported Date and Time Formats</a> in the PHP manual.';

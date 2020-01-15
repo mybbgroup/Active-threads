@@ -118,13 +118,12 @@ table, td, th {
 <table class="tborder tfixed clear">
 	<thead>
 		<tr>
-			<th class="thead" colspan="6" title="{$act_set_period_of_interest_tooltip}">{$act_set_period_of_interest}</td>
+			<th class="thead" colspan="5" title="{$act_set_period_of_interest_tooltip}">{$act_set_period_of_interest}</td>
 		</tr>
 		<tr>
 			<th class="tcat">{$lang->act_num_days}</th>
 			<th class="tcat">{$lang->act_num_hours}</th>
 			<th class="tcat">{$lang->act_num_mins}</th>
-			<th class="tcat">{$lang->act_num_secs}</th>
 			<th class="tcat" title="{$act_before_date_tooltip}">{$lang->act_before_date} [*]</th>
 			<th class="tcat">{$lang->act_sort_by}</th>
 		</tr>
@@ -134,7 +133,6 @@ table, td, th {
 			<td><input type="text" name="days" value="$days" size="5" style="text-align: right;"/></td>
 			<td><input type="text" name="hours" value="$hours" size="5" style="text-align: right;" /></td>
 			<td><input type="text" name="mins" value="$mins" size="5" style="text-align: right;" /></td>
-			<td><input type="text" name="secs" value="$secs" size="5" style="text-align: right;" /></td>
 			<td><input type="text" name="date" value="$date" size="16" style="text-align: right;" title="{$act_before_date_tooltip}" /></td>
 			<td>
 				<input type="radio" name="order" value="ascending" id="sort.asc"{$asc_checked} /><label for ="sort.asc">{$lang->act_asc}</label><br />
