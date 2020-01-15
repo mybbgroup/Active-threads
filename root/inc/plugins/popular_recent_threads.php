@@ -32,10 +32,10 @@ function popular_recent_threads_info() {
 		'website'       => '',
 		'author'        => 'Laird Shaw',
 		'authorsite'    => '',
-		'version'       => '0.0.4-dev',
+		'version'       => '1.0.0',
 		// Constructed by converting each digit of 'version' above into two digits (zero-padded if necessary),
 		// then concatenating them, then removing any leading zero(es) to avoid the value being interpreted as octal.
-		'version_code'  => '4',
+		'version_code'  => '10000',
 		'guid'          => '',
 		'codename'      => C_PRT,
 		'compatibility' => '18*'
