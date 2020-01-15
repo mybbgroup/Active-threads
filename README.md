@@ -7,7 +7,7 @@ This is a plugin for the [MyBB](https://mybb.com/) forum software version 1.8.*.
 3. A page which is arrived at via that "View Active Threads" link, which provides:
    1. A listing of threads which over a specified period (defaulting to 14 days) have had one or more posts made to them, in descending order of number of posts made.
    2. The ability to sort the listing by number of posts, and date of earliest/latest post, made during the specified period.
-   3. The ability to specify the period to a fidelity of seconds up to any given date-time.
+   3. The ability to specify the period to a fidelity of minutes up to any given date-time.
    4. The ability for administrators to set the maximum allowable period in seconds.
 
 What is this plugin useful for?
