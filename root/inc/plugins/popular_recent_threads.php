@@ -7,6 +7,18 @@ if (!defined('IN_MYBB')) {
 
 define('C_PRT', str_replace('.php', '', basename(__FILE__)));
 
+if (!defined('IN_ADMINCP')) {
+	$plugins->add_hook('global_start', 'popular_recent_threads_global_start');
+}
+
+function popular_recent_threads_global_start() {
+	global $lang;
+
+	// Load the language file so that the 'prt_view_pop_thr' message is available for the 'header_welcomeblock_guest' template
+	// on every page.
+	$lang->load(C_PRT);
+}
+
 function popular_recent_threads_info() {
 	global $lang, $db, $mybb;
 
@@ -20,10 +32,10 @@ function popular_recent_threads_info() {
 		'website'       => '',
 		'author'        => 'Laird Shaw',
 		'authorsite'    => '',
-		'version'       => '0.0.3',
+		'version'       => '0.0.4',
 		// Constructed by converting each digit of 'version' above into two digits (zero-padded if necessary),
 		// then concatenating them, then removing any leading zero(es) to avoid the value being interpreted as octal.
-		'version_code'  => '3',
+		'version_code'  => '4',
 		'guid'          => '',
 		'codename'      => C_PRT,
 		'compatibility' => '18*'
@@ -215,6 +227,19 @@ function popular_recent_threads_is_installed() {
 function popular_recent_threads_activate() {
 	global $cache;
 
+	require_once MYBB_ROOT.'/inc/adminfunctions_templates.php';
+	find_replace_templatesets('header_welcomeblock_guest', '(</script>)', '</script>
+				<div class="lower">
+					<div class="wrapper">
+						<ul class="menu user_links">
+							<li><a href="{$mybb->settings[\'bburl\']}/popular_recent_threads.php">{$lang->prt_view_pop_thr}</a></li>
+							<li><a href="{$mybb->settings[\'bburl\']}/search.php?action=getdaily">{$lang->welcome_todaysposts}</a></li>		</ul>
+					</div>
+					<br class="clear" />
+				</div>'
+	);
+	find_replace_templatesets('header_welcomeblock_member_search', '('.preg_quote('<li><a href="{$mybb->settings[\'bburl\']}/search.php?action=getnew">{$lang->welcome_newposts}</a></li>').')', '<li><a href="{$mybb->settings[\'bburl\']}/popular_recent_threads.php">{$lang->prt_view_pop_thr}</a></li>
+<li><a href="{$mybb->settings[\'bburl\']}/search.php?action=getnew">{$lang->welcome_newposts}</a></li>');
 	$lrs_plugins = $cache->read('lrs_plugins');
 	$info = popular_recent_threads_info();
 
@@ -229,4 +254,20 @@ function popular_recent_threads_activate() {
 	);
 	$cache->update('lrs_plugins', $lrs_plugins);
 
+}
+
+function popular_recent_threads_deactivate() {
+	require_once MYBB_ROOT.'/inc/adminfunctions_templates.php';
+	find_replace_templatesets('header_welcomeblock_guest', '('.preg_quote('
+				<div class="lower">
+					<div class="wrapper">
+						<ul class="menu user_links">
+							<li><a href="{$mybb->settings[\'bburl\']}/popular_recent_threads.php">{$lang->prt_view_pop_thr}</a></li>
+							<li><a href="{$mybb->settings[\'bburl\']}/search.php?action=getdaily">{$lang->welcome_todaysposts}</a></li>		</ul>
+					</div>
+					<br class="clear" />
+				</div>').')', '', 0
+	);
+	find_replace_templatesets('header_welcomeblock_member_search', '('.preg_quote('<li><a href="{$mybb->settings[\'bburl\']}/popular_recent_threads.php">{$lang->prt_view_pop_thr}</a></li>
+').')', '', 0);
 }

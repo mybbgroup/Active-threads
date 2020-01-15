@@ -21,3 +21,4 @@ $l['prt_go'              ] = 'Go';
 $l['prt_now'             ] = 'Now';
 $l['prt_no_results'      ] = 'No results found.';
 $l['prt_err_excess_int'  ] = 'Excessive interval of {1} seconds specified (maximum is {2}).';
+$l['prt_view_pop_thr'    ] = 'View Threads by Popularity';
