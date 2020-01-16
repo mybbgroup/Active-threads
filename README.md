@@ -1,22 +1,29 @@
 # The Active Threads plugin for MyBB
 
-This is a plugin for the [MyBB](https://mybb.com/) forum software version 1.8.*. It adds the following features to MyBB:
+Active Threads is a plugin for the [MyBB](https://mybb.com/) forum software version 1.8.*.
 
-1. A "View Active Threads" link in the forum's header for both anonymous viewers and logged in members.
-2. The same "View Today's Posts" link for anonymous viewers that logged in members normally see in the forum's header.
-3. A page which is arrived at via that "View Active Threads" link, which provides:
-   1. A listing of threads which over a specified period (defaulting to the most recent 14 days) have had one or more posts made to them, in descending order of number of posts made.
-   2. The ability to sort the listing by number of posts, and date of earliest/latest post, made during the specified period.
-   3. The ability to specify the period to a fidelity of minutes up to any given date-time.
-   4. The ability for administrators to set the maximum allowable period in seconds.
+It provides a listing of active[1] threads during a specified period defaulting to the most recent fortnight. In that listing are shown each thread's subject, author, and start date, along with the number of posts to it during the specified period, and the dates and authors of the earliest and latest posts made to it during the period.
+
+[1] An "active" thread is simply a thread which has had at least one post made to it during the period in question.
+
+The listing can be sorted by number of posts, as well as by date of earliest or latest post. It is paginated at 20 threads per page.
+
+The period can be specified to a fidelity of minutes up to any given date-time.
+
+Along with the active threads listing page, this plugin adds the following interface features to MyBB:
+
+1. A "View Active Threads" link in the forum's header for both anonymous viewers and logged in members to access the listing page.
+2. The same "View Today's Posts" link for anonymous viewers that logged in members by default see in the forum's header.
+
+In addition, the plugin provides a setting for administrators to set the maximum allowable period in seconds. This is because longer periods can be resource-intensive on the database, and expose your forum to DoS attacks.
 
 What is this plugin useful for?
 
 Two use cases are most likely:
 
-Firstly, to see which threads have been most active in terms of number of posts over the most recent N days, where N defaults to 14.
+Firstly, to see which threads have been most active in terms of number of posts over a given period, typically the most recent N days, where N defaults to 14.
 
-Secondly, to view, in order from most recent to earliest, the latest post to all threads which have been posted to over a certain (configurable) period, defaulting to the most recent 14 days.
+Secondly, to view, in order from most recent to earliest, the latest post to all threads which have been posted to over a certain (configurable) period, defaulting to the most recent 14 days. This can be achieved by sorting in descending order by the final column (date of most recent post to the thread).
 
 ## Installing
 
@@ -36,4 +43,4 @@ Secondly, to view, in order from most recent to earliest, the latest post to all
 
    If (presumably for performance reasons) you wish to limit the maximum configurable period in seconds, then navigate in the ACP to Settings -> Plugin Settings -> Active Threads and enter your preferred value (one week in seconds, for example - a plausible limit for a large board - is 604,800).
 
-That's it. You should now see the "View Active Threads" link in your forum's header. In any case, you should be able to view the plugin's page at http://your-forum.com/root/activethreads.php
+That's it. You should now see the "View Active Threads" link in your forum's header. In any case, you should be able to view the plugin's page at http://your-forum.com/your-forum-root-dir/activethreads.php
