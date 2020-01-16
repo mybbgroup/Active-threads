@@ -32,10 +32,10 @@ function activethreads_info() {
 		'website'       => '',
 		'author'        => 'Laird Shaw',
 		'authorsite'    => '',
-		'version'       => '1.1.0',
+		'version'       => '1.2.0',
 		// Constructed by converting each digit of 'version' above into two digits (zero-padded if necessary),
 		// then concatenating them, then removing any leading zero(es) to avoid the value being interpreted as octal.
-		'version_code'  => '10100',
+		'version_code'  => '10200',
 		'guid'          => '',
 		'codename'      => C_ACT,
 		'compatibility' => '18*'
@@ -61,8 +61,81 @@ function activethreads_install() {
 		'isdefault'    => 0
 	);
 	$db->insert_query('settinggroups', $setting_group);
-	$gid = $db->insert_id();
 
+	act_update_create_settings();
+
+	// Insert the plugin's templates into the database.
+	$templateset = array(
+		'prefix' => 'activethreads',
+		'title' => 'Active Threads',
+	);
+	$db->insert_query('templategroups', $templateset);
+
+	act_install_upgrade_common();
+
+}
+
+function activethreads_uninstall() {
+	global $db, $cache;
+
+	$db->delete_query('templates', "title LIKE 'activethreads_%'");
+	$db->delete_query('templategroups', "prefix in ('activethreads')");
+
+	$res = $db->simple_select('settinggroups', 'gid', "name = '".C_ACT."_settings'", array('limit' => 1));
+	$group = $db->fetch_array($res);
+	if (!empty($group['gid'])) {
+		$db->delete_query('settinggroups', "gid='{$group['gid']}'");
+		$db->delete_query('settings', "gid='{$group['gid']}'");
+		rebuild_settings();
+	}
+
+	$lrs_plugins = $cache->read('lrs_plugins');
+	unset($lrs_plugins[C_ACT]);
+	$cache->update('lrs_plugins', $lrs_plugins);
+}
+
+function activethreads_is_installed() {
+	global $db;
+
+	$res = $db->simple_select('templates', '*', "title LIKE '".C_ACT."_%'");
+	return ($db->affected_rows() > 0);
+}
+
+function act_upgrade() {
+	global $db;
+
+	// Update the master templates.
+	act_install_upgrade_common();
+
+	// Save existing values for the plugin's settings.
+	$existing_setting_values = array();
+	$res = $db->simple_select('settinggroups', 'gid', "name = '".C_ACT."_settings'", array('limit' => 1));
+	$group = $db->fetch_array($res);
+	if (!empty($group['gid'])) {
+		$res = $db->simple_select('settings', 'value, name', "gid='{$group['gid']}'");
+		while ($setting = $db->fetch_array($res)) {
+			$existing_setting_values[$setting['name']] = $setting['value'];
+		}
+	}
+
+	act_update_create_settings($existing_setting_values);
+}
+
+
+function act_update_create_settings($existing_setting_values = array()) {
+	global $db, $lang;
+
+	$lang->load(C_ACT);
+
+	// Get the group ID for activethreads settings.
+	$res = $db->simple_select('settinggroups', 'gid', "name = '".C_ACT."_settings'", array('limit' => 1));
+	$row = $db->fetch_array($res);
+	$gid = $row['gid'];
+
+	// Delete existing activethreads settings, without deleting their group
+	$db->delete_query('settings', "gid='{$gid}'");
+
+	// The settings to (re)create in the database.
 	$settings = array(
 		'max_interval_in_secs' => array(
 			'title'       => $lang->act_max_interval_in_secs_title,
@@ -72,14 +145,16 @@ function activethreads_install() {
 		),
 	);
 
+	// (Re)create the settings, retaining the old values where they exist.
 	$x = 1;
 	foreach ($settings as $name => $setting) {
+		$value = isset($existing_setting_values[C_ACT.'_'.$name]) ? $existing_setting_values[C_ACT.'_'.$name] : $setting['value'];
 		$insert_settings = array(
 			'name' => $db->escape_string(C_ACT.'_'.$name),
 			'title' => $db->escape_string($setting['title']),
 			'description' => $db->escape_string($setting['description']),
 			'optionscode' => $db->escape_string($setting['optionscode']),
-			'value' => $db->escape_string($setting['value']),
+			'value' => $value,
 			'disporder' => $x,
 			'gid' => $gid,
 			'isdefault' => 0
@@ -87,14 +162,12 @@ function activethreads_install() {
 		$db->insert_query('settings', $insert_settings);
 		$x++;
 	}
-	rebuild_settings();
 
-	// Insert the plugin's templates into the database.
-	$templateset = array(
-		'prefix' => 'activethreads',
-		'title' => 'Active Threads',
-	);
-	$db->insert_query('templategroups', $templateset);
+	rebuild_settings();
+}
+
+function act_install_upgrade_common() {
+	global $mybb, $db, $lang, $cache;
 
 	$templates = array(
 		'activethreads_page'
@@ -115,7 +188,7 @@ table, td, th {
 {$results_html}
 {$multipage}
 <form method="get" action="activethreads.php">
-<table class="tborder tfixed clear">
+<table class="tborder clear xxx">
 	<thead>
 		<tr>
 			<th class="thead" colspan="5" title="{$act_set_period_of_interest_tooltip}">{$act_set_period_of_interest}</td>
@@ -161,7 +234,7 @@ table, td, th {
 		<td class="$bgcolor" style="text-align: right;">$max_post_date_link<div class="smalltext"><span class="author">$max_post_username_link</span></div></td>
 	</tr>',
 		'activethreads_results' =>
-'<table class="tborder tfixed clear">
+'<table class="tborder clear">
 <thead>
 	<tr>
 		<th class="thead" colspan="5">{$lang_act_recent_threads_title}</td>
@@ -195,45 +268,46 @@ table, td, th {
 	// MyBB sets the version for modified templates to the value of $mybb->version_code.
 	$version = substr($mybb->version_code.'_'.$plugin_version_code, 0, 20);
 	foreach ($templates as $template_title => $template_data) {
-		$insert_templates = array(
+		$template_row = array(
 			'title'    => $db->escape_string($template_title),
 			'template' => $db->escape_string($template_data),
 			'sid'      => '-2',
 			'version'  => $version,
 			'dateline' => TIME_NOW
 		);
-		$db->insert_query('templates', $insert_templates);
+
+		$res = $db->simple_select('templates', 'tid', "sid='-2' AND title='".$db->escape_string($template_title)."'");
+		$existing = $db->fetch_array($res);
+		if ($existing['tid']) {
+			unset($template_row['sid']);
+			unset($template_row['title']);
+			$db->update_query('templates', $template_row, "title='".$db->escape_string($template_title)."' AND sid='-2'");
+		} else {
+			$db->insert_query('templates', $template_row);
+		}
 	}
-}
-
-function activethreads_uninstall() {
-	global $db, $cache;
-
-	$db->delete_query('templates', "title LIKE 'activethreads_%'");
-	$db->delete_query('templategroups', "prefix in ('activethreads')");
-
-	$res = $db->simple_select('settinggroups', 'gid', "name = '".C_ACT."_settings'", array('limit' => 1));
-	$group = $db->fetch_array($res);
-	if (!empty($group['gid'])) {
-		$db->delete_query('settinggroups', "gid='{$group['gid']}'");
-		$db->delete_query('settings', "gid='{$group['gid']}'");
-		rebuild_settings();
-	}
-
-	$lrs_plugins = $cache->read('lrs_plugins');
-	unset($lrs_plugins[C_ACT]);
-	$cache->update('lrs_plugins', $lrs_plugins);
-}
-
-function activethreads_is_installed() {
-	global $db;
-
-	$res = $db->simple_select('templates', '*', "title LIKE 'activethreads_%'");
-	return ($db->affected_rows() > 0);
 }
 
 function activethreads_activate() {
 	global $cache;
+
+	$lrs_plugins = $cache->read('lrs_plugins');
+	$info = activethreads_info();
+
+	$old_version_code = $lrs_plugins[C_ACT]['version_code'];
+	$new_version_code = $info['version_code'];
+
+	// Perform necessary upgrades.
+	if ($new_version_code > $old_version_code) {
+		act_upgrade();
+	}
+
+	// Update the version in the permanent cache.
+	$lrs_plugins[C_ACT] = array(
+		'version'      => $info['version'     ],
+		'version_code' => $info['version_code'],
+	);
+	$cache->update('lrs_plugins', $lrs_plugins);
 
 	require_once MYBB_ROOT.'/inc/adminfunctions_templates.php';
 	find_replace_templatesets('header_welcomeblock_guest', '(</script>)', '</script>
@@ -248,19 +322,6 @@ function activethreads_activate() {
 	);
 	find_replace_templatesets('header_welcomeblock_member_search', '('.preg_quote('<li><a href="{$mybb->settings[\'bburl\']}/search.php?action=getnew">{$lang->welcome_newposts}</a></li>').')', '<li><a href="{$mybb->settings[\'bburl\']}/activethreads.php">{$lang->act_view_act_thr}</a></li>
 <li><a href="{$mybb->settings[\'bburl\']}/search.php?action=getnew">{$lang->welcome_newposts}</a></li>');
-	$lrs_plugins = $cache->read('lrs_plugins');
-	$info = activethreads_info();
-
-	$old_version_code = $lrs_plugins[C_ACT]['version_code'];
-	$new_version_code = $info['version_code'];
-
-	// In future, any necessary upgrades may be performed when $new_version_code > $old_version_code.
-	// For now, simply update the code in the permanent cache.
-	$lrs_plugins[C_ACT] = array(
-		'version'      => $info['version'     ],
-		'version_code' => $info['version_code'],
-	);
-	$cache->update('lrs_plugins', $lrs_plugins);
 
 }
 

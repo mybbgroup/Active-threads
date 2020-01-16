@@ -44,3 +44,19 @@ Secondly, to view, in order from most recent to earliest, the latest post to all
    If (presumably for performance reasons) you wish to limit the maximum configurable period in seconds, then navigate in the ACP to Settings -> Plugin Settings -> Active Threads and enter your preferred value (one week in seconds, for example - a plausible limit for a large board - is 604,800).
 
 That's it. You should now see the "View Active Threads" link in your forum's header. In any case, you should be able to view the plugin's page at http://your-forum.com/your-forum-root-dir/activethreads.php
+
+## Upgrading
+
+1. *Deactivate*.
+
+   In a web browser, open the "Plugins" module in the Admin Control Panel (ACP) of your MyBB installation and click "Deactivate" beside the "Active Threads" plugin.
+
+2. *Copy files*.
+
+   As in step two for installing above.
+
+3. *Reactivate*.
+
+   As for step one but clicking "Activate" rather than "Deactivate".
+
+This will maintain any settings and template changes that you've made, though if you've made template changes, you may after upgrading need to navigate in the ACP to Templates & Style -> Templates -> Find Updated Templates to properly integrate/update this plugin's templates.
