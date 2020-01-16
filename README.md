@@ -51,9 +51,9 @@ That's it. You should now see the "View Active Threads" link in your forum's hea
 
    In a web browser, open the "Plugins" module in the Admin Control Panel (ACP) of your MyBB installation and click "Deactivate" beside the "Active Threads" plugin.
 
-2. *Copy files*.
+2. *Download and Copy files*.
 
-   As in step two for installing above.
+   As in steps one and two for installing above.
 
 3. *Reactivate*.
 
