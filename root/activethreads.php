@@ -145,8 +145,9 @@ if ($active_plugins && $active_plugins['activethreads']) {
  INNER JOIN mybb_users uthr ON uthr.uid = t.uid
  WHERE      $conds
  GROUP BY   p.tid";
-	$res = $db->query($inner_sql);
-	$tot_rows = $db->affected_rows();
+	$res = $db->query("SELECT count(*) AS cnt FROM ($inner_sql) AS mainq");
+	$rows = $db->fetch_array($res);
+	$tot_rows = $rows['cnt'];
 
 	$order_by = $sort.' '.($order == 'descending' ? 'DESC' : 'ASC');
 

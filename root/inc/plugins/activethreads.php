@@ -32,7 +32,7 @@ function activethreads_info() {
 		'website'       => '',
 		'author'        => 'Laird Shaw',
 		'authorsite'    => '',
-		'version'       => '1.2.0',
+		'version'       => '1.2.0-dev',
 		// Constructed by converting each digit of 'version' above into two digits (zero-padded if necessary),
 		// then concatenating them, then removing any leading zero(es) to avoid the value being interpreted as octal.
 		'version_code'  => '10200',
