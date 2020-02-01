@@ -227,7 +227,7 @@ table, td, th {
 </html>',
 		'activethreads_result_row' => '
 	<tr class="inline_row">
-		<td class="$bgcolor forumdisplay_regular" style="text-align: left;">$thread_link<div class="smalltext"><span class="author">$thread_username_link</span> <span style="float: right;">$thread_date</span></div></td>
+		<td class="$bgcolor forumdisplay_regular" style="text-align: left;"><span class="$new_class">$gotounread$thread_link</span><div class="smalltext"><span class="author">$thread_username_link</span> <span style="float: right;">$thread_date</span></div></td>
 		<td class="$bgcolor">$num_posts_fmt</td>
 		<td class="$bgcolor">$forum_links</td>
 		<td class="$bgcolor" style="text-align: right;">$min_post_date_link<div class="smalltext"><span class="author">$min_post_username_link</span></div></td>

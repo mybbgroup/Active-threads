@@ -133,6 +133,8 @@ if ($active_plugins && $active_plugins['activethreads']) {
             t.dateline AS thread_dateline,
             uthr.uid AS thread_uid,
             uthr.username AS thread_username,
+            t.closed AS thread_closed,
+            t.lastpost AS thread_lastpost,
             f.parentlist,
             f.fid,
             f.name AS forum_name,
@@ -157,6 +159,8 @@ SELECT mainq.tid,
        mainq.thread_dateline,
        mainq.thread_uid,
        mainq.thread_username,
+       mainq.thread_lastpost,
+       mainq.thread_closed,
        mainq.parentlist,
        mainq.fid,
        mainq.forum_name,
@@ -181,17 +185,77 @@ ORDER BY   $order_by
 LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 
 	$res = $db->query($sql);
-	$rows = $forum_names = array();
+	$rows = $fids = $forum_names = $tids = $moved_threads = array();
 	
 	$result_rows = '';
 	while (($row = $db->fetch_array($res))) {
+		$fids[] = $row['fid'];
 		$forum_names[$row['fid']] = $row['forum_name'];
 		foreach (explode(',', $row['parentlist']) as $fid) {
 			if (empty($forum_names[$fid])) {
 				$forum_names[$fid] = null;
 			}
 		}
+
+		// The logic below has been taken from inc/forumdisplay.php
+
+		// If this is a moved thread, then set the tid for participation marking and thread read marking to that of the moved thread
+		if (substr($row['closed'], 0, 5) == 'moved') {
+			$tid = substr($row['closed'], 6);
+			if (!isset($tids[$tid])) {
+				$moved_threads[$tid] = $row['tid'];
+				$tids[$row['tid']] = $tid;
+			}
+		} else {
+			// Otherwise, set it to the plain thread ID
+			$tids[$row['tid']] = $row['tid'];
+			if (isset($moved_threads[$row['tid']])) {
+				unset($moved_threads[$row['tid']]);
+			}
+		}
+
 		$rows[] = $row;
+	}
+
+	// This logic for determining each thread's last read date by the user has also been taken from inc/forumdisplay.php
+	if (!empty($tids)) {
+		$tids = implode(',', $tids);
+	}
+	if ($mybb->user['uid'] && $mybb->settings['threadreadcut'] > 0 && !empty($rows)) {
+		$res = $db->simple_select('threadsread', '*', "uid='{$mybb->user['uid']}' AND tid IN ({$tids})");
+		while ($row = $db->fetch_array($res)) {
+			if (!empty($moved_threads[$row['tid']])) {
+				$row['tid'] = $moved_threads[$row['tid']];
+			}
+			if($rows[$row['tid']]) {
+				$rows[$row['tid']]['lastread'] = $row['dateline'];
+			}
+		}
+	}
+
+	// This logic for determining each forum's read date cutoff has been adapted from inc/forumdisplay.php
+	$forum_reads = array();
+	$read_cutoff = TIME_NOW - $mybb->settings['threadreadcut']*60*60*24;
+	if ($fids && $mybb->settings['threadreadcut'] > 0 && $mybb->user['uid']) {
+		$fids_list = implode(',', $fids);
+		$res = $db->simple_select('forumsread', 'fid, dateline', "fid IN ({$fids_list}) AND uid='{$mybb->user['uid']}'");
+		while ($row = $db->fetch_array($res)) {
+			$forum_read = $row['dateline'];
+			if ($forum_read == 0 || $forum_read < $read_cutoff) {
+				$forum_read = $read_cutoff;
+			}
+			$forum_reads[$row['fid']] = $forum_read;
+		}
+	} else {
+		$forum_read = my_get_array_cookie('forumread', $fid);
+
+		if (isset($mybb->cookies['mybb']['readallforums']) && !$forum_read) {
+			$forum_read = $mybb->cookies['mybb']['lastvisit'];
+		}
+
+		foreach ($fids as $fid) {
+			$forum_reads[$fid] = $forum_read;
+		}
 	}
 
 	$missing_fids = array();
@@ -212,6 +276,8 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 		foreach ($rows as $row) {
 			$i = 1 - $i;
 			$bgcolor = 'trow'.($i+1);
+			$fid = $row['fid'];
+			$moved = explode('|', $row['closed']);
 			$thread_link = act_get_threadlink($row['tid'], $row['thread_subject']);
 			$thread_username_link = act_get_usernamelink($row['thread_uid'], $row['thread_username']);
 			$thread_date = my_date('normal', $row['thread_dateline']);
@@ -221,6 +287,38 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 			$min_post_username_link = act_get_usernamelink($row['min_uid'], $row['min_username']);
 			$max_post_date_link = act_get_postlink($row['max_pid'], my_date('normal', $row['max_dateline']));
 			$max_post_username_link = act_get_usernamelink($row['max_uid'], $row['max_username']);
+
+			// The below logic for determining whether to show an "unread" arrow has been adapted from inc/forumdisplay.php,
+			// and includes some currently superfluous code which will come in handy later.
+			$gotounread = '';
+			$isnew = 0;
+			$donenew = 0;
+			if ($mybb->settings['threadreadcut'] > 0 && $mybb->user['uid'] && $row['thread_lastpost'] > $forum_reads[$fid]) {
+				if (!empty($row['lastread'])) {
+					$last_read = $row['lastread'];
+				} else {
+					$last_read = $read_cutoff;
+				}
+			} else {
+				$last_read = my_get_array_cookie('threadread', $row['tid']);
+			}
+			if ($forum_reads[$fid] > $last_read) {
+				$last_read = $forum_reads[$fid];
+			}
+			if ($row['thread_lastpost'] > $last_read && $moved[0] != 'moved') {
+				$folder .= 'new';
+				$folder_label .= $lang->icon_new;
+				$new_class = 'subject_new';
+				$thread = array(
+					'newpostlink' => get_thread_link($row['tid'], 0, 'newpost')
+				);
+				eval('$gotounread = "'.$templates->get("forumdisplay_thread_gotounread").'";');
+				$unreadpost = 1;
+			} else {
+				$folder_label .= $lang->icon_no_new;
+				$new_class = 'subject_old';
+			}
+
 			eval("\$result_rows .= \"".$templates->get('activethreads_result_row', 1, 0)."\";");
 		}
 
