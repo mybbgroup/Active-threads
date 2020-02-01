@@ -188,7 +188,7 @@ table, td, th {
 {$results_html}
 {$multipage}
 <form method="get" action="activethreads.php">
-<table class="tborder clear xxx">
+<table class="tborder clear">
 	<thead>
 		<tr>
 			<th class="thead" colspan="5" title="{$act_set_period_of_interest_tooltip}">{$act_set_period_of_interest}</td>
@@ -227,6 +227,8 @@ table, td, th {
 </html>',
 		'activethreads_result_row' => '
 	<tr class="inline_row">
+		<td align="center" class="$bgcolor" width="2%"><span class="thread_status {$folder}" title="{$folder_label}">&nbsp;</span></td>
+		<td align="center" class="{$bgcolor}" width="2%">{$icon}</td>
 		<td class="$bgcolor forumdisplay_regular" style="text-align: left;"><span class="$new_class">$gotounread$thread_link</span><div class="smalltext"><span class="author">$thread_username_link</span> <span style="float: right;">$thread_date</span></div></td>
 		<td class="$bgcolor">$num_posts_fmt</td>
 		<td class="$bgcolor">$forum_links</td>
@@ -237,10 +239,10 @@ table, td, th {
 '<table class="tborder clear">
 <thead>
 	<tr>
-		<th class="thead" colspan="5">{$lang_act_recent_threads_title}</td>
+		<th class="thead" colspan="7">{$lang_act_recent_threads_title}</th>
 	</tr>
 	<tr>
-		<th class="tcat" style="text-align: left;">{$lang->act_thread_author_start}</th>
+		<th class="tcat" style="text-align: left;" colspan="3">{$lang->act_thread_author_start}</th>
 		<th class="tcat">{$num_posts_heading}</th>
 		<th class="tcat">{$lang->act_cont_forum}</th>
 		<th class="tcat" style="text-align: right;">{$min_dateline_heading}</th>
@@ -289,7 +291,7 @@ table, td, th {
 }
 
 function activethreads_activate() {
-	global $cache;
+	global $cache, $db;
 
 	$lrs_plugins = $cache->read('lrs_plugins');
 	$info = activethreads_info();
@@ -323,9 +325,34 @@ function activethreads_activate() {
 	find_replace_templatesets('header_welcomeblock_member_search', '('.preg_quote('<li><a href="{$mybb->settings[\'bburl\']}/search.php?action=getnew">{$lang->welcome_newposts}</a></li>').')', '<li><a href="{$mybb->settings[\'bburl\']}/activethreads.php">{$lang->act_view_act_thr}</a></li>
 <li><a href="{$mybb->settings[\'bburl\']}/search.php?action=getnew">{$lang->welcome_newposts}</a></li>');
 
+
+	// Attach the core code's thread_status.css file to this plugin's page.
+	$res = $db->simple_select('themestylesheets', 'attachedto,tid', "name='thread_status.css'");
+	$made_changes = false;
+	while ($row = $db->fetch_array($res)) {
+		$tid = $row['tid'];
+		$attachedto = explode('|', $row['attachedto']);
+		if (!in_array('activethreads.php', $attachedto)) {
+			if (count($attachedto) == 1 && $attachedto[0] == '') {
+				$attachedto = array();
+			}
+			$attachedto[] = 'activethreads.php';
+			$db->update_query('themestylesheets', array('attachedto' => implode('|', $attachedto)), "name='thread_status.css' AND tid=$tid");
+		}
+		$made_changes = true;
+	}
+	if ($made_changes) {
+		require_once MYBB_ADMIN_DIR.'inc/functions_themes.php';
+		$tids = $db->simple_select('themes', 'tid');
+		while ($theme = $db->fetch_array($tids)) {
+			update_theme_stylesheet_list($theme['tid']);
+		}
+	}
 }
 
 function activethreads_deactivate() {
+	global $db;
+
 	require_once MYBB_ROOT.'/inc/adminfunctions_templates.php';
 	find_replace_templatesets('header_welcomeblock_guest', '('.preg_quote('
 				<div class="lower">
@@ -339,4 +366,25 @@ function activethreads_deactivate() {
 	);
 	find_replace_templatesets('header_welcomeblock_member_search', '('.preg_quote('<li><a href="{$mybb->settings[\'bburl\']}/activethreads.php">{$lang->act_view_act_thr}</a></li>
 ').')', '', 0);
+
+
+	// Dettach the core code's thread_status.css file from this plugin's page.
+	$res = $db->simple_select('themestylesheets', 'attachedto,tid', "name='thread_status.css'");
+	$made_changes = false;
+	while ($row = $db->fetch_array($res)) {
+		$tid = $row['tid'];
+		$attachedto = explode('|', $row['attachedto']);
+		if (($idx = array_search('activethreads.php', $attachedto)) !== false) {
+			unset($attachedto[$idx]);
+			$db->update_query('themestylesheets', array('attachedto' => implode('|', $attachedto)), "name='thread_status.css' AND tid=$tid");
+		}
+		$made_changes = true;
+	}
+	if ($made_changes) {
+		require_once MYBB_ADMIN_DIR.'inc/functions_themes.php';
+		$tids = $db->simple_select('themes', 'tid');
+		while ($theme = $db->fetch_array($tids)) {
+			update_theme_stylesheet_list($theme['tid']);
+		}
+	}
 }

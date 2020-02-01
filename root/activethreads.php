@@ -3,6 +3,7 @@
 define('IN_MYBB', 1);
 require_once './global.php';
 
+define('THIS_SCRIPT', 'activethreads.php');
 define('ACT_NUM_DAYS', 14);
 define('ACT_ITEMS_PER_PAGE', 20);
 
@@ -40,8 +41,13 @@ function act_get_flinks($parentlist, $forum_names) {
 	return $flinks;
 }
 
-function act_make_url($days, $hours, $mins, $date, $sort, $order, $page) {
-	return "activethreads.php?days=$days&hours=$hours&mins=$mins&date=".urlencode($date)."&sort=$sort&order=$order&page=$page";
+function act_make_url($days, $hours, $mins, $date, $sort, $order, $page, $encode = true) {
+	$ret = "activethreads.php?days=$days&hours=$hours&mins=$mins&date=".urlencode($date)."&sort=$sort&order=$order&page=$page";
+	if ($encode) {
+		$ret = htmlspecialchars_uni($ret);
+	}
+
+	return $ret;
 }
 
 if (!is_array($plugins_cache)) {
@@ -135,6 +141,9 @@ if ($active_plugins && $active_plugins['activethreads']) {
             uthr.username AS thread_username,
             t.closed AS thread_closed,
             t.lastpost AS thread_lastpost,
+            t.replies AS thread_replies,
+            t.views AS thread_views,
+            t.icon AS thread_icon,
             f.parentlist,
             f.fid,
             f.name AS forum_name,
@@ -160,7 +169,10 @@ SELECT mainq.tid,
        mainq.thread_uid,
        mainq.thread_username,
        mainq.thread_lastpost,
+       mainq.thread_replies,
+       mainq.thread_views,
        mainq.thread_closed,
+       mainq.thread_icon,
        mainq.parentlist,
        mainq.fid,
        mainq.forum_name,
@@ -214,13 +226,26 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 			}
 		}
 
-		$rows[] = $row;
+		$rows[$row['tid']] = $row;
 	}
 
-	// This logic for determining each thread's last read date by the user has also been taken from inc/forumdisplay.php
+	// This check for participation by the current user in any of these threads - for 'dot' folder icons - has also been adapted from inc/forumdisplay.php
 	if (!empty($tids)) {
 		$tids = implode(',', $tids);
 	}
+	if ($mybb->settings['dotfolders'] != 0 && $mybb->user['uid'] && !empty($rows)) {
+		$res = $db->simple_select('posts', "DISTINCT tid,uid", "uid='{$mybb->user['uid']}' AND tid IN ({$tids}) AND visible > 0");
+		while ($row = $db->fetch_array($res)) {
+			if (!empty($moved_threads[$row['tid']])) {
+				$row['tid'] = $moved_threads[$row['tid']];
+			}
+			if ($rows[$row['tid']]) {
+				$rows[$row['tid']]['doticon'] = 1;
+			}
+		}
+	}
+
+	// This logic for determining each thread's last read date by the user has also been taken from inc/forumdisplay.php
 	if ($mybb->user['uid'] && $mybb->settings['threadreadcut'] > 0 && !empty($rows)) {
 		$res = $db->simple_select('threadsread', '*', "uid='{$mybb->user['uid']}' AND tid IN ({$tids})");
 		while ($row = $db->fetch_array($res)) {
@@ -272,6 +297,7 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 	}
 
 	$i = 1;
+	$icon_cache = $cache->read('posticons');
 	if ($rows) {
 		foreach ($rows as $row) {
 			$i = 1 - $i;
@@ -288,8 +314,15 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 			$max_post_date_link = act_get_postlink($row['max_pid'], my_date('normal', $row['max_dateline']));
 			$max_post_username_link = act_get_usernamelink($row['max_uid'], $row['max_username']);
 
-			// The below logic for determining whether to show an "unread" arrow has been adapted from inc/forumdisplay.php,
-			// and includes some currently superfluous code which will come in handy later.
+			// The below logic for determining the folder image, icon and whether to show an "unread" arrow
+			// has been adapted from code in inc/forumdisplay.php.
+			$folder = '';
+			$folder_label = '';
+			$lang->load('forumdisplay');
+			if (isset($row['doticon'])) {
+				$folder = "dot_";
+				$folder_label .= $lang->icon_dot;
+			}
 			$gotounread = '';
 			$isnew = 0;
 			$donenew = 0;
@@ -318,6 +351,26 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 				$folder_label .= $lang->icon_no_new;
 				$new_class = 'subject_old';
 			}
+			if ($row['thread_replies'] >= $mybb->settings['hottopic'] || $row['thread_views'] >= $mybb->settings['hottopicviews']) {
+				$folder .= 'hot';
+				$folder_label .= $lang->icon_hot;
+			}
+			if ($row['closed'] == 1) {
+				$folder .= 'close';
+				$folder_label .= $lang->icon_close;
+			}
+			if ($moved[0] == 'moved') {
+				$folder = 'move';
+				$gotounread = '';
+			}
+			$folder .= 'folder';
+			if ($row['thread_icon'] > 0 && $icon_cache[$row['thread_icon']]) {
+				$icon = $icon_cache[$row['thread_icon']];
+				$icon['path'] = str_replace("{theme}", $theme['imgdir'], $icon['path']);
+				$icon['path'] = htmlspecialchars_uni($icon['path']);
+				$icon['name'] = htmlspecialchars_uni($icon['name']);
+				eval("\$icon = \"".$templates->get("forumdisplay_thread_icon")."\";");
+			} else	$icon = "&nbsp;";
 
 			eval("\$result_rows .= \"".$templates->get('activethreads_result_row', 1, 0)."\";");
 		}
