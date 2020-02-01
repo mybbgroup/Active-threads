@@ -32,10 +32,10 @@ function activethreads_info() {
 		'website'       => '',
 		'author'        => 'Laird Shaw',
 		'authorsite'    => '',
-		'version'       => '1.2.0-dev',
+		'version'       => '1.2.1',
 		// Constructed by converting each digit of 'version' above into two digits (zero-padded if necessary),
 		// then concatenating them, then removing any leading zero(es) to avoid the value being interpreted as octal.
-		'version_code'  => '10200',
+		'version_code'  => '10201',
 		'guid'          => '',
 		'codename'      => C_ACT,
 		'compatibility' => '18*'
