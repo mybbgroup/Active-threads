@@ -41,7 +41,7 @@ function act_get_flinks($parentlist, $forum_names) {
 }
 
 function act_make_url($days, $hours, $mins, $date, $sort, $order, $page) {
-	return "activethreads.php&days=$days&hours=$hours&mins=$mins&date=".urlencode($date)."&sort=$sort&order=$order&page=$page";
+	return "activethreads.php?days=$days&hours=$hours&mins=$mins&date=".urlencode($date)."&sort=$sort&order=$order&page=$page";
 }
 
 if (!is_array($plugins_cache)) {
