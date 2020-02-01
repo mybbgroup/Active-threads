@@ -144,6 +144,8 @@ if ($active_plugins && $active_plugins['activethreads']) {
             t.replies AS thread_replies,
             t.views AS thread_views,
             t.icon AS thread_icon,
+            t.poll AS thread_poll,
+            t.prefix AS thread_prefix,
             f.parentlist,
             f.fid,
             f.name AS forum_name,
@@ -173,6 +175,8 @@ SELECT mainq.tid,
        mainq.thread_views,
        mainq.thread_closed,
        mainq.thread_icon,
+       mainq.thread_poll,
+       mainq.thread_prefix,
        mainq.parentlist,
        mainq.fid,
        mainq.forum_name,
@@ -371,6 +375,21 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 				$icon['name'] = htmlspecialchars_uni($icon['name']);
 				eval("\$icon = \"".$templates->get("forumdisplay_thread_icon")."\";");
 			} else	$icon = "&nbsp;";
+			$prefix = '';
+			if ($row['thread_poll']) {
+				$prefix = $lang->poll_prefix;
+			}
+			if ($moved[0] == "moved") {
+				$prefix = $lang->moved_prefix;
+			}
+			// If this thread has a prefix, insert a space between prefix and subject
+			$threadprefix_disp = $threadprefix = '';
+			if ($row['thread_prefix'] != 0) {
+				$threadprefix = build_prefixes($row['thread_prefix']);
+				if (!empty($threadprefix)) {
+					$threadprefix_disp = $threadprefix['displaystyle'].'&nbsp;';
+				}
+			}
 
 			eval("\$result_rows .= \"".$templates->get('activethreads_result_row', 1, 0)."\";");
 		}
