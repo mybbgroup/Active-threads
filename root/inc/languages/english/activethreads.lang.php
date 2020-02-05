@@ -1,7 +1,9 @@
 <?php
 
 $l['act_inactive'        ] = 'The plugin which supports this feature is currently inactive.';
-$l['act_thread_author_start'] = 'Thread / Author / Start';
+$l['act_thread'          ] = 'Thread';
+$l['act_author'          ] = 'Author';
+$l['act_start'           ] = 'Start';
 $l['act_num_posts'       ] = 'Number of posts during this period';
 $l['act_cont_forum'      ] = 'Containing forum';
 $l['act_earliest_posting'] = 'Earliest post during this period';
@@ -25,7 +27,7 @@ $l['act_sort_by_earliest'] = 'Sort by: date of earliest post';
 $l['act_sort_by_latest'  ] = 'Sort by: date of latest post';
 $l['act_go'              ] = 'Go';
 $l['act_now'             ] = 'Now';
-$l['act_no_results	'      ] = 'No results found.';
+$l['act_no_results'      ] = 'No results found.';
 $l['act_err_excess_int'  ] = 'Excessive interval of {1} seconds specified (maximum is {2}).';
 $l['act_view_act_thr'    ] = 'View Active Threads';
 $l['act_mark_all_read'   ] = 'Mark all threads read';

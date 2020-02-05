@@ -260,11 +260,11 @@ table, td, th {
 		<th class="thead" colspan="7">{$lang_act_recent_threads_title}</th>
 	</tr>
 	<tr>
-		<th class="tcat" style="text-align: left;" colspan="3"><span class="smalltext">{$lang->act_thread_author_start}</span></th>
+		<th class="tcat" style="text-align: left;" colspan="3"><span class="smalltext">{$thread_subject_heading} / {$thread_username_heading} / {$thread_dateline_heading}</span></th>
 		<th class="tcat"><span class="smalltext">{$num_posts_heading}</span></th>
-		<th class="tcat"><span class="smalltext">{$lang->act_cont_forum}</span></th>
-		<th class="tcat" style="text-align: right;"><span class="smalltext">{$min_dateline_heading}</span></th>
-		<th class="tcat" style="text-align: right;"><span class="smalltext">{$max_dateline_heading}</span></th>
+		<th class="tcat"><span class="smalltext">{$forum_name_heading}</span></th>
+		<th class="tcat" style="text-align: right;"><span class="smalltext">{$min_dateline_heading} / {$min_author_heading}</span></th>
+		<th class="tcat" style="text-align: right;"><span class="smalltext">{$max_dateline_heading} / {$max_author_heading}</span></th>
 	</tr>
 </thead>
 <tbody>

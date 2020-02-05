@@ -206,6 +206,12 @@ if ($active_plugins && $active_plugins['activethreads']) {
 	switch ($sort) {
 	case 'min_dateline':
 	case 'max_dateline':
+	case 'thread_subject':
+	case 'thread_username':
+	case 'thread_dateline':
+	case 'forum_name':
+	case 'min_username':
+	case 'max_username':
 		break;
 	default:
 		$sort = 'num_posts';
@@ -540,6 +546,12 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 		$num_posts_heading    = '<a href="'.act_make_url($days, $hours, $mins, $date, 'num_posts', 'descending', $page).'">'.$lang->act_num_posts.'</a>';
 		$min_dateline_heading = '<a href="'.act_make_url($days, $hours, $mins, $date, 'min_dateline', 'descending', $page).'">'.$lang->act_earliest_posting.'</a>';
 		$max_dateline_heading = '<a href="'.act_make_url($days, $hours, $mins, $date, 'max_dateline', 'descending', $page).'">'.$lang->act_latest_posting.'</a>';
+		$thread_subject_heading = '<a href="'.act_make_url($days, $hours, $mins, $date, 'thread_subject', 'descending', $page).'">'.$lang->act_thread.'</a>';
+		$thread_username_heading = '<a href="'.act_make_url($days, $hours, $mins, $date, 'thread_username', 'descending', $page).'">'.$lang->act_author.'</a>';
+		$thread_dateline_heading = '<a href="'.act_make_url($days, $hours, $mins, $date, 'thread_dateline', 'descending', $page).'">'.$lang->act_start.'</a>';
+		$forum_name_heading      = '<a href="'.act_make_url($days, $hours, $mins, $date, 'forum_name', 'descending', $page).'">'.$lang->act_cont_forum.'</a>';
+		$min_author_heading      = '<a href="'.act_make_url($days, $hours, $mins, $date, 'min_username', 'descending', $page).'">'.$lang->act_author.'</a>';
+		$max_author_heading      = '<a href="'.act_make_url($days, $hours, $mins, $date, 'max_username', 'descending', $page).'">'.$lang->act_author.'</a>';
 		switch ($sort) {
 		case 'num_posts':
 			$num_posts_heading    = $lang->act_num_posts.$sorter;
@@ -549,6 +561,24 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 			break;
 		case 'max_dateline':
 			$max_dateline_heading = $lang->act_latest_posting.$sorter;
+			break;
+		case 'thread_subject':
+			$thread_subject_heading = $lang->act_thread.$sorter;
+			break;
+		case 'thread_username':
+			$thread_username_heading = $lang->act_author.$sorter;
+			break;
+		case 'thread_dateline':
+			$thread_dateline_heading = $lang->act_start.$sorter;
+			break;
+		case 'forum_name':
+			$forum_name_heading = $lang->act_cont_forum.$sorter;
+			break;
+		case 'min_username':
+			$min_author_heading = $lang->act_author.$sorter;
+			break;
+		case 'max_username':
+			$max_author_heading = $lang->act_author.$sorter;
 			break;
 		}
 		$lang_act_recent_threads_title = $lang->sprintf($lang->act_act_recent_threads_title, $days, $hours, $mins, $date_prior, $date_for_title);
