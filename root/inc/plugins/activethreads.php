@@ -47,10 +47,10 @@ function activethreads_info() {
 		'website'       => '',
 		'author'        => 'Laird Shaw',
 		'authorsite'    => '',
-		'version'       => '1.2.3-dev',
+		'version'       => '1.2.4',
 		// Constructed by converting each digit of 'version' above into two digits (zero-padded if necessary),
 		// then concatenating them, then removing any leading zero(es) to avoid the value being interpreted as octal.
-		'version_code'  => '10203',
+		'version_code'  => '10204',
 		'guid'          => '',
 		'codename'      => C_ACT,
 		'compatibility' => '18*'
@@ -158,6 +158,24 @@ function act_update_create_settings($existing_setting_values = array()) {
 			'optionscode' => 'numeric',
 			'value'       => '0'
 		),
+		'display_thread_avatar' => array(
+			'title'       => $lang->act_display_thread_avatar_title,
+			'description' => $lang->act_display_thread_avatar_desc,
+			'optionscode' => 'yesno',
+			'value'       => '0'
+		),
+		'display_earliestpost_avatar' => array(
+			'title'       => $lang->act_display_earliestpost_avatar_title,
+			'description' => $lang->act_display_earliestpost_avatar_desc,
+			'optionscode' => 'yesno',
+			'value'       => '0'
+		),
+		'display_latestpost_avatar' => array(
+			'title'       => $lang->act_display_latestpost_avatar_title,
+			'description' => $lang->act_display_latestpost_avatar_desc,
+			'optionscode' => 'yesno',
+			'value'       => '0'
+		),
 	);
 
 	if (isset($existing_setting_values[C_ACT.'_max_interval_in_secs']) && !isset($existing_setting_values[C_ACT.'_max_interval_in_mins'])) {
@@ -257,11 +275,11 @@ table, td, th {
 	<tr class="inline_row">
 		<td align="center" class="$bgcolor" width="2%"><span class="thread_status {$folder}" title="{$folder_label}">&nbsp;</span></td>
 		<td align="center" class="{$bgcolor}" width="2%">{$icon}</td>
-		<td class="$bgcolor forumdisplay_regular" style="text-align: left;">{$prefix} $gotounread$threadprefix_disp<span class="$new_class">$thread_link</span><div class="smalltext"><span class="author">$thread_username_link</span> <span style="float: right;">$thread_date</span></div></td>
+		<td class="$bgcolor forumdisplay_regular" style="text-align: left;"><div style="float: left;">{$thread_avatar}</div><div style="margin-left: {$margin_thread}px;">{$prefix} $gotounread$threadprefix_disp<span class="$new_class">$thread_link</span><div><span class="smalltext author">$thread_username_link</span> <span class="smalltext" style="float: right;">$thread_date</span></div></div></td>
 		<td class="$bgcolor"><a href="{$mybb->settings[\'bburl\']}/activethreads.php?action=whoposted&amp;tid={$tid}&amp;min_dateline={$row[\'min_dateline\']}&amp;max_dateline={$row[\'max_dateline\']}" onclick="activethreads_whoPosted({$tid}, {$row[\'min_dateline\']}, {$row[\'max_dateline\']}); return false;">$num_posts_fmt</a></td>
 		<td class="$bgcolor" style="text-align: left;">$forum_links</td>
-		<td class="$bgcolor" style="text-align: right;">$min_post_date_link<div class="smalltext"><span class="author">$min_post_username_link</span></div></td>
-		<td class="$bgcolor" style="text-align: right;">$max_post_date_link<div class="smalltext"><span class="author">$max_post_username_link</span></div></td>
+		<td class="$bgcolor" style="text-align: right;"><div style="float: right">{$earliestpost_avatar}</div><div style="margin-right: {$margin_earliest}px;">{$min_post_date_link}<div class="smalltext"><span class="author">$min_post_username_link</span></div></div></td>
+		<td class="$bgcolor" style="text-align: right;"><div style="float: right">{$latestpost_avatar}</div><div style="margin-right: {$margin_latest}px;">{$max_post_date_link}<div class="smalltext"><span class="author">$max_post_username_link</span></div></div></td>
 	</tr>',
 		'activethreads_results' =>
 '<table class="tborder clear">

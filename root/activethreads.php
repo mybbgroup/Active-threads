@@ -538,7 +538,40 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 					$threadprefix_disp = $threadprefix['displaystyle'].'&nbsp;';
 				}
 			}
-
+			$size = 35;
+			$avatar_margin = $size + 5;
+			$dims = 'width="'.$size.'" height="'.$size.'"';
+			if ($settings[C_ACT.'_display_thread_avatar'] != 0) {
+				$margin_thread = $size + $avatar_margin;
+				$memprofile = get_user($row['thread_uid']);
+				$useravatar = format_avatar($memprofile['avatar']);
+				$useravatar['width_height'] = $dims;
+				eval('$thread_avatar = "'.$templates->get("member_profile_avatar").'";');
+				$margin_thread = $avatar_margin;
+			} else {
+				$thread_avatar = '';
+				$margin_thread = 0;
+			}
+			if ($settings[C_ACT.'_display_earliestpost_avatar'] != 0) {
+				$memprofile = get_user($row['min_uid']);
+				$useravatar = format_avatar($memprofile['avatar']);
+				$useravatar['width_height'] = $dims;
+				eval('$earliestpost_avatar = "'.$templates->get("member_profile_avatar").'";');
+				$margin_earliest = $avatar_margin;
+			} else {
+				$earliestpost_avatar = '';
+				$margin_earliest = 0;
+			}
+			if ($settings[C_ACT.'_display_latestpost_avatar'] != 0) {
+				$memprofile = get_user($row['max_uid']);
+				$useravatar = format_avatar($memprofile['avatar']);
+				$useravatar['width_height'] = $dims;
+				eval('$latestpost_avatar = "'.$templates->get("member_profile_avatar").'";');
+				$margin_latest = $avatar_margin;
+			} else {
+				$latestpost_avatar = '';
+				$margin_latest = 0;
+			}
 			eval('$result_rows .= "'.$templates->get('activethreads_result_row', 1, 0).'";');
 		}
 
