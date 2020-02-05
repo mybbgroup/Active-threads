@@ -152,13 +152,17 @@ function act_update_create_settings($existing_setting_values = array()) {
 
 	// The settings to (re)create in the database.
 	$settings = array(
-		'max_interval_in_secs' => array(
-			'title'       => $lang->act_max_interval_in_secs_title,
-			'description' => $lang->act_max_interval_in_secs_desc,
+		'max_interval_in_mins' => array(
+			'title'       => $lang->act_max_interval_in_mins_title,
+			'description' => $lang->act_max_interval_in_mins_desc,
 			'optionscode' => 'numeric',
 			'value'       => '0'
 		),
 	);
+
+	if (isset($existing_setting_values[C_ACT.'_max_interval_in_secs']) && !isset($existing_setting_values[C_ACT.'_max_interval_in_mins'])) {
+		$settings['max_interval_in_mins']['value'] = floor($existing_setting_values[C_ACT.'_max_interval_in_secs'] / 60);
+	}
 
 	// (Re)create the settings, retaining the old values where they exist.
 	$x = 1;

@@ -193,7 +193,7 @@ if ($active_plugins && $active_plugins['activethreads']) {
 		exit;
 	}
 
-	$max_interval = $mybb->settings[C_ACT.'_max_interval_in_secs'];
+	$max_interval = $mybb->settings[C_ACT.'_max_interval_in_mins'];
 
 	$days = $mybb->get_input('days', MyBB::INPUT_INT);
 	$hours = $mybb->get_input('hours', MyBB::INPUT_INT);
@@ -222,16 +222,15 @@ if ($active_plugins && $active_plugins['activethreads']) {
 	}
 
 	if ($days == 0 && $hours == 0 && $mins == 0) {
-		if ($max_interval > 0 && ACT_NUM_DAYS * 24*60*60 > $max_interval) {
-			$mins = $max_interval * 60;
+		if ($max_interval > 0 && ACT_NUM_DAYS * 24 * 60 > $max_interval) {
+			$mins = $max_interval;
 		} else	$days = ACT_NUM_DAYS;
 	}
 	if (!$page) $page = 1;
 
-	$secs_before = $days;
-	$secs_before = $secs_before * 24 + $hours;
-	$secs_before = $secs_before * 60 + $mins;
-	$secs_before = $secs_before * 60;
+	$mins_before = $days;
+	$mins_before = $mins_before * 24 + $hours;
+	$mins_before = $mins_before * 60 + $mins;
 
 	if ($date) {
 		if ($mybb->user['dst'] == 1) {
@@ -247,11 +246,12 @@ if ($active_plugins && $active_plugins['activethreads']) {
 		$date = 'Now';
 		$date_for_title = $lang->act_now;
 	}
-	$date_prior = my_date('normal', $ts_epoch - $secs_before);
+	$date_prior = my_date('normal', $ts_epoch - $mins_before * 60);
 
-	if ($max_interval > 0 && $secs_before > $max_interval) {
-		error($lang->sprintf($lang->act_err_excess_int, $secs_before, $max_interval));
+	if ($max_interval > 0 && $mins_before > $max_interval) {
+		error($lang->sprintf($lang->act_err_excess_int, my_number_format($mins_before), my_number_format($max_interval)));
 	}
+	$secs_before = $mins_before * 60;
 
 	$conds = 'p.dateline >= '.($ts_epoch - $secs_before).' AND p.dateline <= '.$ts_epoch;
 

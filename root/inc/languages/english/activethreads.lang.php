@@ -28,6 +28,6 @@ $l['act_sort_by_latest'  ] = 'Sort by: date of latest post';
 $l['act_go'              ] = 'Go';
 $l['act_now'             ] = 'Now';
 $l['act_no_results'      ] = 'No results found.';
-$l['act_err_excess_int'  ] = 'Excessive interval of {1} seconds specified (maximum is {2}).';
+$l['act_err_excess_int'  ] = 'Excessive interval of {1} minutes specified (maximum is {2}).';
 $l['act_view_act_thr'    ] = 'View Active Threads';
 $l['act_mark_all_read'   ] = 'Mark all threads read';
