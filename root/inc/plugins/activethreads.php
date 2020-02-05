@@ -47,7 +47,7 @@ function activethreads_info() {
 		'website'       => '',
 		'author'        => 'Laird Shaw',
 		'authorsite'    => '',
-		'version'       => '1.2.4',
+		'version'       => '1.2.4-dev',
 		// Constructed by converting each digit of 'version' above into two digits (zero-padded if necessary),
 		// then concatenating them, then removing any leading zero(es) to avoid the value being interpreted as octal.
 		'version_code'  => '10204',
@@ -156,7 +156,7 @@ function act_update_create_settings($existing_setting_values = array()) {
 			'title'       => $lang->act_max_interval_in_mins_title,
 			'description' => $lang->act_max_interval_in_mins_desc,
 			'optionscode' => 'numeric',
-			'value'       => '0'
+			'value'       => '43200' // 30 days
 		),
 		'display_thread_avatar' => array(
 			'title'       => $lang->act_display_thread_avatar_title,
