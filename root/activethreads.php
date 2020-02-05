@@ -587,6 +587,12 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 		$num_posts_selected    = ($sort  == 'num_posts'    ? ' selected="selected"' : '');
 		$min_dateline_selected = ($sort  == 'min_dateline' ? ' selected="selected"' : '');
 		$max_dateline_selected = ($sort  == 'max_dateline' ? ' selected="selected"' : '');
+		$thread_subject_selected  = ($sort  == 'thread_subject'  ? ' selected="selected"' : '');
+		$thread_username_selected = ($sort  == 'thread_username' ? ' selected="selected"' : '');
+		$thread_dateline_selected = ($sort  == 'thread_dateline' ? ' selected="selected"' : '');
+		$forum_name_selected      = ($sort  == 'forum_name'      ? ' selected="selected"' : '');
+		$min_username_selected    = ($sort  == 'min_username'    ? ' selected="selected"' : '');
+		$max_username_selected    = ($sort  == 'max_username'    ? ' selected="selected"' : '');
 		eval("\$results_html = \"".$templates->get('activethreads_results', 1, 0)."\";");
 
 	} else {

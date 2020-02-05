@@ -237,6 +237,12 @@ table, td, th {
 				<option value="num_posts"$num_posts_selected>{$lang->act_sort_by_num_posts}</option>
 				<option value="min_dateline"$min_dateline_selected>{$lang->act_sort_by_earliest}</option>
 				<option value="max_dateline"$max_dateline_selected>{$lang->act_sort_by_latest}</option>
+				<option value="thread_subject"$thread_subject_selected>{$lang->act_sort_by_thread_subject}</option>
+				<option value="thread_username"$thread_username_selected>{$lang->act_sort_by_thread_username}</option>
+				<option value="thread_dateline"$thread_dateline_selected>{$lang->act_sort_by_thread_dateline}</option>
+				<option value="forum_name"$forum_name_selected>{$lang->act_sort_by_forum_name}</option>
+				<option value="min_username"$min_username_selected>{$lang->act_sort_by_min_username}</option>
+				<option value="max_username"$max_username_selected>{$lang->act_sort_by_max_username}</option>
 			</select>
 		</td>
 	</tr>
