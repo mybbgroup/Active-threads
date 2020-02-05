@@ -47,10 +47,10 @@ function activethreads_info() {
 		'website'       => '',
 		'author'        => 'Laird Shaw',
 		'authorsite'    => '',
-		'version'       => '1.2.2',
+		'version'       => '1.2.3',
 		// Constructed by converting each digit of 'version' above into two digits (zero-padded if necessary),
 		// then concatenating them, then removing any leading zero(es) to avoid the value being interpreted as octal.
-		'version_code'  => '10202',
+		'version_code'  => '10203',
 		'guid'          => '',
 		'codename'      => C_ACT,
 		'compatibility' => '18*'
@@ -200,9 +200,11 @@ table, td, th {
 </head>
 <body>
 {$header}
+<a href="misc.php?action=markread{$post_code_string}" class="smalltext">{$lang->act_mark_all_read}</a>
 {$multipage}
 {$results_html}
 {$multipage}
+
 <form method="get" action="activethreads.php">
 <table class="tborder clear">
 	<thead>
