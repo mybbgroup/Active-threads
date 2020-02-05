@@ -207,36 +207,36 @@ table, td, th {
 
 <form method="get" action="activethreads.php">
 <table class="tborder clear">
-	<thead>
-		<tr>
-			<th class="thead" colspan="5" title="{$act_set_period_of_interest_tooltip}">{$act_set_period_of_interest}</td>
-		</tr>
-		<tr>
-			<th class="tcat">{$lang->act_num_days}</th>
-			<th class="tcat">{$lang->act_num_hours}</th>
-			<th class="tcat">{$lang->act_num_mins}</th>
-			<th class="tcat" title="{$act_before_date_tooltip}">{$lang->act_before_date} [*]</th>
-			<th class="tcat">{$lang->act_sort_by}</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-			<td><input type="text" name="days" value="$days" size="5" style="text-align: right;"/></td>
-			<td><input type="text" name="hours" value="$hours" size="5" style="text-align: right;" /></td>
-			<td><input type="text" name="mins" value="$mins" size="5" style="text-align: right;" /></td>
-			<td><input type="text" name="date" value="$date" size="16" style="text-align: right;" title="{$act_before_date_tooltip}" /></td>
-			<td>
-				<input type="radio" name="order" value="ascending" id="sort.asc"{$asc_checked} /><label for ="sort.asc">{$lang->act_asc}</label><br />
-				<input type="radio" name="order" value="descending" id="sort.desc"{$desc_checked} /><label for ="sort.desc">{$lang->act_desc}</label>
-				<br />
-				<select name="sort">
-					<option value="num_posts"$num_posts_selected>{$lang->act_sort_by_num_posts}</option>
-					<option value="min_dateline"$min_dateline_selected>{$lang->act_sort_by_earliest}</option>
-					<option value="max_dateline"$max_dateline_selected>{$lang->act_sort_by_latest}</option>
-				</select>
-			</td>
-		</tr>
-	</tbody>
+<thead>
+	<tr>
+		<th class="thead" colspan="5" title="{$act_set_period_of_interest_tooltip}">{$act_set_period_of_interest}</th>
+	</tr>
+	<tr>
+		<th class="tcat"><span class="smalltext">{$lang->act_num_days}</span></th>
+		<th class="tcat"><span class="smalltext">{$lang->act_num_hours}</span></th>
+		<th class="tcat"><span class="smalltext">{$lang->act_num_mins}</span></th>
+		<th class="tcat" title="{$act_before_date_tooltip}"><span class="smalltext">{$lang->act_before_date} [*]</span></th>
+		<th class="tcat"><span class="smalltext">{$lang->act_sort_by}</span></th>
+	</tr>
+</thead>
+<tbody>
+	<tr>
+		<td><input type="text" name="days" value="$days" size="5" style="text-align: right;"/></td>
+		<td><input type="text" name="hours" value="$hours" size="5" style="text-align: right;" /></td>
+		<td><input type="text" name="mins" value="$mins" size="5" style="text-align: right;" /></td>
+		<td><input type="text" name="date" value="$date" size="16" style="text-align: right;" title="{$act_before_date_tooltip}" /></td>
+		<td>
+			<input type="radio" name="order" value="ascending" id="sort.asc"{$asc_checked} /><label for ="sort.asc">{$lang->act_asc}</label><br />
+			<input type="radio" name="order" value="descending" id="sort.desc"{$desc_checked} /><label for ="sort.desc">{$lang->act_desc}</label>
+			<br />
+			<select name="sort">
+				<option value="num_posts"$num_posts_selected>{$lang->act_sort_by_num_posts}</option>
+				<option value="min_dateline"$min_dateline_selected>{$lang->act_sort_by_earliest}</option>
+				<option value="max_dateline"$max_dateline_selected>{$lang->act_sort_by_latest}</option>
+			</select>
+		</td>
+	</tr>
+</tbody>
 </table>
 <p style="text-align: center">[*] {$lang->act_before_date_footnote}<br /><input type="submit" name="go" value="{$lang->act_go}" class="button" /></p>
 </form>
@@ -260,11 +260,11 @@ table, td, th {
 		<th class="thead" colspan="7">{$lang_act_recent_threads_title}</th>
 	</tr>
 	<tr>
-		<th class="tcat" style="text-align: left;" colspan="3">{$lang->act_thread_author_start}</th>
-		<th class="tcat">{$num_posts_heading}</th>
-		<th class="tcat">{$lang->act_cont_forum}</th>
-		<th class="tcat" style="text-align: right;">{$min_dateline_heading}</th>
-		<th class="tcat" style="text-align: right;">{$max_dateline_heading}</th>
+		<th class="tcat" style="text-align: left;" colspan="3"><span class="smalltext">{$lang->act_thread_author_start}</span></th>
+		<th class="tcat"><span class="smalltext">{$num_posts_heading}</span></th>
+		<th class="tcat"><span class="smalltext">{$lang->act_cont_forum}</span></th>
+		<th class="tcat" style="text-align: right;"><span class="smalltext">{$min_dateline_heading}</span></th>
+		<th class="tcat" style="text-align: right;"><span class="smalltext">{$max_dateline_heading}</span></th>
 	</tr>
 </thead>
 <tbody>
