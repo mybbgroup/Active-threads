@@ -249,7 +249,7 @@ table, td, th {
 		<td align="center" class="{$bgcolor}" width="2%">{$icon}</td>
 		<td class="$bgcolor forumdisplay_regular" style="text-align: left;">{$prefix} $gotounread$threadprefix_disp<span class="$new_class">$thread_link</span><div class="smalltext"><span class="author">$thread_username_link</span> <span style="float: right;">$thread_date</span></div></td>
 		<td class="$bgcolor"><a href="{$mybb->settings[\'bburl\']}/activethreads.php?action=whoposted&amp;tid={$tid}&amp;min_dateline={$row[\'min_dateline\']}&amp;max_dateline={$row[\'max_dateline\']}" onclick="activethreads_whoPosted({$tid}, {$row[\'min_dateline\']}, {$row[\'max_dateline\']}); return false;">$num_posts_fmt</a></td>
-		<td class="$bgcolor">$forum_links</td>
+		<td class="$bgcolor" style="text-align: left;">$forum_links</td>
 		<td class="$bgcolor" style="text-align: right;">$min_post_date_link<div class="smalltext"><span class="author">$min_post_username_link</span></div></td>
 		<td class="$bgcolor" style="text-align: right;">$max_post_date_link<div class="smalltext"><span class="author">$max_post_username_link</span></div></td>
 	</tr>',
