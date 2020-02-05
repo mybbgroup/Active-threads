@@ -546,7 +546,7 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 				$memprofile = get_user($row['thread_uid']);
 				$useravatar = format_avatar($memprofile['avatar']);
 				$useravatar['width_height'] = $dims;
-				eval('$thread_avatar = "'.$templates->get("member_profile_avatar").'";');
+				eval('$thread_avatar = "'.$templates->get('activethreads_threadstarter_avatar').'";');
 				$margin_thread = $avatar_margin;
 			} else {
 				$thread_avatar = '';
@@ -556,7 +556,7 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 				$memprofile = get_user($row['min_uid']);
 				$useravatar = format_avatar($memprofile['avatar']);
 				$useravatar['width_height'] = $dims;
-				eval('$earliestpost_avatar = "'.$templates->get("member_profile_avatar").'";');
+				eval('$earliestpost_avatar = "'.$templates->get('activethreads_earliestposter_avatar').'";');
 				$margin_earliest = $avatar_margin;
 			} else {
 				$earliestpost_avatar = '';
@@ -566,7 +566,7 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 				$memprofile = get_user($row['max_uid']);
 				$useravatar = format_avatar($memprofile['avatar']);
 				$useravatar['width_height'] = $dims;
-				eval('$latestpost_avatar = "'.$templates->get("member_profile_avatar").'";');
+				eval('$latestpost_avatar = "'.$templates->get('activethreads_latestposter_avatar').'";');
 				$margin_latest = $avatar_margin;
 			} else {
 				$latestpost_avatar = '';

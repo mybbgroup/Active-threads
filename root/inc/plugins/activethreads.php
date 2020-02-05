@@ -337,7 +337,10 @@ table, td, th {
 </table>
 {$footer}
 </body>
-</html>'
+</html>',
+		'activethreads_threadstarter_avatar'  => '<img src="{$useravatar[\'image\']}" alt="" {$useravatar[\'width_height\']} />',
+		'activethreads_earliestposter_avatar' => '<img src="{$useravatar[\'image\']}" alt="" {$useravatar[\'width_height\']} />',
+		'activethreads_latestposter_avatar'   => '<img src="{$useravatar[\'image\']}" alt="" {$useravatar[\'width_height\']} />',
 	);
 
 	$info = activethreads_info();
