@@ -579,12 +579,12 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 		$num_posts_heading    = '<a href="'.act_make_url($days, $hours, $mins, $date, 'num_posts', 'descending', $page).'">'.$lang->act_num_posts.'</a>';
 		$min_dateline_heading = '<a href="'.act_make_url($days, $hours, $mins, $date, 'min_dateline', 'descending', $page).'">'.$lang->act_earliest_posting.'</a>';
 		$max_dateline_heading = '<a href="'.act_make_url($days, $hours, $mins, $date, 'max_dateline', 'descending', $page).'">'.$lang->act_latest_posting.'</a>';
-		$thread_subject_heading = '<a href="'.act_make_url($days, $hours, $mins, $date, 'thread_subject', 'descending', $page).'">'.$lang->act_thread.'</a>';
-		$thread_username_heading = '<a href="'.act_make_url($days, $hours, $mins, $date, 'thread_username', 'descending', $page).'">'.$lang->act_author.'</a>';
+		$thread_subject_heading = '<a href="'.act_make_url($days, $hours, $mins, $date, 'thread_subject', 'ascending', $page).'">'.$lang->act_thread.'</a>';
+		$thread_username_heading = '<a href="'.act_make_url($days, $hours, $mins, $date, 'thread_username', 'ascending', $page).'">'.$lang->act_author.'</a>';
 		$thread_dateline_heading = '<a href="'.act_make_url($days, $hours, $mins, $date, 'thread_dateline', 'descending', $page).'">'.$lang->act_start.'</a>';
-		$forum_name_heading      = '<a href="'.act_make_url($days, $hours, $mins, $date, 'forum_name', 'descending', $page).'">'.$lang->act_cont_forum.'</a>';
-		$min_author_heading      = '<a href="'.act_make_url($days, $hours, $mins, $date, 'min_username', 'descending', $page).'">'.$lang->act_author.'</a>';
-		$max_author_heading      = '<a href="'.act_make_url($days, $hours, $mins, $date, 'max_username', 'descending', $page).'">'.$lang->act_author.'</a>';
+		$forum_name_heading      = '<a href="'.act_make_url($days, $hours, $mins, $date, 'forum_name', 'ascending', $page).'">'.$lang->act_cont_forum.'</a>';
+		$min_author_heading      = '<a href="'.act_make_url($days, $hours, $mins, $date, 'min_username', 'ascending', $page).'">'.$lang->act_author.'</a>';
+		$max_author_heading      = '<a href="'.act_make_url($days, $hours, $mins, $date, 'max_username', 'ascending', $page).'">'.$lang->act_author.'</a>';
 		switch ($sort) {
 		case 'num_posts':
 			$num_posts_heading    = $lang->act_num_posts.$sorter;
