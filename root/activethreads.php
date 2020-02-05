@@ -497,7 +497,7 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 				$thread = array(
 					'newpostlink' => get_thread_link($tid, 0, 'newpost')
 				);
-				eval('$gotounread = "'.$templates->get("forumdisplay_thread_gotounread").'";');
+				eval('$gotounread = "'.$templates->get('forumdisplay_thread_gotounread').'";');
 				$unreadpost = 1;
 			} else {
 				$folder_label .= $lang->icon_no_new;
@@ -521,7 +521,7 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 				$icon['path'] = str_replace("{theme}", $theme['imgdir'], $icon['path']);
 				$icon['path'] = htmlspecialchars_uni($icon['path']);
 				$icon['name'] = htmlspecialchars_uni($icon['name']);
-				eval("\$icon = \"".$templates->get("forumdisplay_thread_icon")."\";");
+				eval('$icon = "'.$templates->get('forumdisplay_thread_icon').'";');
 			} else	$icon = "&nbsp;";
 			$prefix = '';
 			if ($row['thread_poll']) {
@@ -593,7 +593,7 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 		$forum_name_selected      = ($sort  == 'forum_name'      ? ' selected="selected"' : '');
 		$min_username_selected    = ($sort  == 'min_username'    ? ' selected="selected"' : '');
 		$max_username_selected    = ($sort  == 'max_username'    ? ' selected="selected"' : '');
-		eval("\$results_html = \"".$templates->get('activethreads_results', 1, 0)."\";");
+		eval('$results_html = "'.$templates->get('activethreads_results', 1, 0).'";');
 
 	} else {
 		$results_html = '<p style="text-align: center">'.$lang->act_no_results.'</p>';
@@ -604,6 +604,6 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 	$multipage = multipage($tot_rows, ACT_ITEMS_PER_PAGE, $page, act_make_url($days, $hours, $mins, $date, $sort, $order, '{page}'));
 	add_breadcrumb($lang->act_act_recent_threads_breadcrumb, C_ACT.'.php');
 	$post_code_string = "&amp;my_post_key={$mybb->post_code}";
-	eval("\$html = \"".$templates->get('activethreads_page', 1, 0)."\";");
+	eval('$html = "'.$templates->get('activethreads_page', 1, 0).'";');
 	output_page($html);
 } else	echo $lang->act_inactive;
