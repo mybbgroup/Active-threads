@@ -32,10 +32,10 @@ function activethreads_info() {
 		'website'       => '',
 		'author'        => 'Laird Shaw',
 		'authorsite'    => '',
-		'version'       => '1.2.1',
+		'version'       => '1.2.2',
 		// Constructed by converting each digit of 'version' above into two digits (zero-padded if necessary),
 		// then concatenating them, then removing any leading zero(es) to avoid the value being interpreted as octal.
-		'version_code'  => '10201',
+		'version_code'  => '10202',
 		'guid'          => '',
 		'codename'      => C_ACT,
 		'compatibility' => '18*'
@@ -181,6 +181,7 @@ table, td, th {
 	border-spacing: 0;
 }
 </style>
+<script type="text/javascript" src="{$mybb->settings[\'bburl\']}/jscripts/activethreads.js"></script>
 </head>
 <body>
 {$header}
@@ -230,7 +231,7 @@ table, td, th {
 		<td align="center" class="$bgcolor" width="2%"><span class="thread_status {$folder}" title="{$folder_label}">&nbsp;</span></td>
 		<td align="center" class="{$bgcolor}" width="2%">{$icon}</td>
 		<td class="$bgcolor forumdisplay_regular" style="text-align: left;">{$prefix} $gotounread$threadprefix_disp<span class="$new_class">$thread_link</span><div class="smalltext"><span class="author">$thread_username_link</span> <span style="float: right;">$thread_date</span></div></td>
-		<td class="$bgcolor">$num_posts_fmt</td>
+		<td class="$bgcolor"><a href="{$mybb->settings[\'bburl\']}/activethreads.php?action=whoposted&amp;tid={$tid}&amp;min_dateline={$row[\'min_dateline\']}&amp;max_dateline={$row[\'max_dateline\']}" onclick="activethreads_whoPosted({$tid}, {$row[\'min_dateline\']}, {$row[\'max_dateline\']}); return false;">$num_posts_fmt</a></td>
 		<td class="$bgcolor">$forum_links</td>
 		<td class="$bgcolor" style="text-align: right;">$min_post_date_link<div class="smalltext"><span class="author">$min_post_username_link</span></div></td>
 		<td class="$bgcolor" style="text-align: right;">$max_post_date_link<div class="smalltext"><span class="author">$max_post_username_link</span></div></td>
@@ -253,6 +254,45 @@ table, td, th {
 {$result_rows}
 </tbody>
 </table>',
+		// Largely copied from core code's misc_whoposted but with support added for a date range
+		// by calling activethreads_whoPosted() when sorting rather than MyBB.whoPosted().
+		'activethreads_whoposted' => '<div class="modal">
+	<div style="overflow-y: auto; max-height: 400px;">
+<table width="100%" cellspacing="{$theme[\'borderwidth\']}" cellpadding="{$theme[\'tablespace\']}" border="0" align="center" class="tborder">
+<tr>
+<td colspan="2" class="thead"><strong>{$lang->total_posts} {$numposts}</strong></td>
+</tr>
+<tr>
+<td class="tcat"><span class="smalltext"><strong><a href="javascript:void(0)"  onclick="activethreads_whoPosted({$thread[\'tid\']}, {$min_dateline}, {$max_dateline}, \'username\'); return false;">{$lang->user}</a></strong></span></td>
+<td class="tcat"><span class="smalltext"><strong><a href="javascript:void(0)"  onclick="activethreads_whoPosted({$thread[\'tid\']}, {$min_dateline}, {$max_dateline}); return false;">{$lang->num_posts}</a></strong></span></td>
+</tr>
+{$whoposted}
+</table>
+</div>
+</div>',
+		// Largely copied from core code's misc_whoposted_page but with support added for a date range
+		// by requesting activethreads.php when sorting rather than misc.php.
+		'activethreads_whoposted_page' => '<html>
+<head>
+<title>{$thread[\'subject\']} - {$lang->who_posted}</title>
+{$headerinclude}
+</head>
+<body>
+{$header}
+<br />
+<table border="0" cellspacing="{$theme[\'borderwidth\']}" cellpadding="{$theme[\'tablespace\']}" class="tborder">
+<tr>
+<td colspan="2" class="thead"><strong>{$lang->total_posts} {$numposts}</strong></td>
+</tr>
+<tr>
+<td class="tcat"><span class="smalltext"><strong><a href="{$mybb->settings[\'bburl\']}/activethreads.php?action=whoposted&amp;tid={$thread[\'tid\']}&amp;min_dateline={$min_dateline}&amp;max_dateline={$max_dateline}&amp;sort=username">{$lang->user}</a></strong></span></td>
+<td class="tcat"><span class="smalltext"><strong><a href="{$mybb->settings[\'bburl\']}/activethreads.php?action=whoposted&amp;tid={$thread[\'tid\']}&amp;min_dateline={$min_dateline}&amp;max_dateline={$max_dateline}">{$lang->num_posts}</a></strong></span></td>
+</tr>
+{$whoposted}
+</table>
+{$footer}
+</body>
+</html>'
 	);
 
 	$info = activethreads_info();

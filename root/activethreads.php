@@ -56,6 +56,128 @@ if (!is_array($plugins_cache)) {
 $active_plugins = $plugins_cache['active'];
 
 if ($active_plugins && $active_plugins['activethreads']) {
+	// The below conditional and the code included in its remit has been adapted and largely copied wholesale from misc.php.
+	// The main addition is that it requires a date range to be stipulated for the posts to be considered from the thread.
+	if ($mybb->input['action'] == 'whoposted') {
+		$lang->load('misc');
+		$numposts = 0;
+		$altbg = alt_trow();
+		$whoposted = '';
+		$tid = $mybb->get_input('tid', MyBB::INPUT_INT);
+		$thread = get_thread($tid);
+		$modal = $mybb->get_input('modal', MyBB::INPUT_INT);
+		$min_dateline = $mybb->get_input('min_dateline', MyBB::INPUT_INT);
+		$max_dateline = $mybb->get_input('max_dateline', MyBB::INPUT_INT);
+
+		// Make sure we are looking at a real thread here.
+		if (!$thread) {
+			error($lang->error_invalidthread);
+		}
+
+		// Make sure we are looking at a real thread here.
+		if (($thread['visible'] == -1 && !is_moderator($thread['fid'], 'canviewdeleted'))
+		    ||
+		    ($thread['visible'] == 0 && !is_moderator($thread['fid'], "canviewunapprove"))
+		    ||
+		    $thread['visible'] > 1
+		) {
+			error($lang->error_invalidthread);
+		}
+
+		if (is_moderator($thread['fid'], 'canviewdeleted') || is_moderator($thread['fid'], 'canviewunapprove')) {
+			if (is_moderator($thread['fid'], 'canviewunapprove') && !is_moderator($thread['fid'], 'canviewdeleted')) {
+				$show_posts = 'p.visible IN (0,1)';
+			} else if(is_moderator($thread['fid'], 'canviewdeleted') && !is_moderator($thread['fid'], 'canviewunapprove')) {
+				$show_posts = 'p.visible IN (-1,1)';
+			} else {
+				$show_posts = 'p.visible IN (-1,0,1)';
+			}
+		} else	$show_posts = 'p.visible = 1';
+
+		// Does the thread belong to a valid forum?
+		$forum = get_forum($thread['fid']);
+		if (!$forum || $forum['type'] != 'f') {
+			error($lang->error_invalidforum);
+		}
+
+		// Does the user have permission to view this thread?
+		$forumpermissions = forum_permissions($forum['fid']);
+
+		if ($forumpermissions['canview'] == 0
+		    ||
+		    $forumpermissions['canviewthreads'] == 0
+		    ||
+		    (isset($forumpermissions['canonlyviewownthreads']) && $forumpermissions['canonlyviewownthreads'] != 0 && $thread['uid'] != $mybb->user['uid'])
+		) {
+			error_no_permission();
+		}
+
+		// Check if this forum is password protected and we have a valid password
+		check_forum_password($forum['fid']);
+
+		if ($mybb->get_input('sort') != 'username') {
+			$sortsql = ' ORDER BY posts DESC';
+		} else	$sortsql = ' ORDER BY p.username ASC';
+		$whoposted = '';
+		$query = $db->query("
+			SELECT COUNT(p.pid) AS posts, p.username AS postusername, u.uid, u.username, u.usergroup, u.displaygroup
+			FROM ".TABLE_PREFIX."posts p
+			LEFT JOIN ".TABLE_PREFIX."users u ON (u.uid=p.uid)
+			WHERE tid='".$tid."' AND $show_posts AND p.dateline >= '$min_dateline' AND p.dateline <= '$max_dateline'
+			GROUP BY u.uid, p.username, u.uid, u.username, u.usergroup, u.displaygroup
+			".$sortsql);
+		while ($poster = $db->fetch_array($query)) {
+			if ($poster['username'] == '') {
+				$poster['username'] = $poster['postusername'];
+			}
+			$poster['username'] = htmlspecialchars_uni($poster['username']);
+			$poster['postusername'] = htmlspecialchars_uni($poster['postusername']);
+			$poster_name = format_name($poster['username'], $poster['usergroup'], $poster['displaygroup']);
+			if ($modal) {
+				$onclick = '';
+				if ($poster['uid']) {
+					$onclick = "location.href='".get_profile_link($poster['uid'])."'; return false;";
+				}
+				$profile_link = build_profile_link($poster_name, $poster['uid'], '_blank', $onclick);
+			} else {
+				$profile_link = build_profile_link($poster_name, $poster['uid']);
+			}
+			$numposts += $poster['posts'];
+			eval('$whoposted .= "'.$templates->get('misc_whoposted_poster').'";');
+			$altbg = alt_trow();
+		}
+		$numposts = my_number_format($numposts);
+		$poster['posts'] = my_number_format($poster['posts']);
+		if ($modal) {
+			eval('$whop = "'.$templates->get('activethreads_whoposted', 1, 0).'";');
+			echo $whop;
+		} else {
+			require_once MYBB_ROOT."inc/class_parser.php";
+			$parser = new postParser;
+
+			// Get thread prefix
+			$breadcrumbprefix = '';
+			$threadprefix = array('prefix' => '');
+			if ($thread['prefix']) {
+				$threadprefix = build_prefixes($thread['prefix']);
+				if (!empty($threadprefix['displaystyle'])) {
+					$breadcrumbprefix = $threadprefix['displaystyle'].'&nbsp;';
+				}
+			}
+
+			$thread['subject'] = htmlspecialchars_uni($parser->parse_badwords($thread['subject']));
+
+			// Build the navigation.
+			build_forum_breadcrumb($forum['fid']);
+			add_breadcrumb($breadcrumbprefix.$thread['subject'], get_thread_link($thread['tid']));
+			add_breadcrumb($lang->who_posted);
+
+			eval('$whoposted = "'.$templates->get('activethreads_whoposted_page').'";');
+			output_page($whoposted);
+		}
+		exit;
+	}
+
 	$max_interval = $mybb->settings[C_ACT.'_max_interval_in_secs'];
 
 	$days = $mybb->get_input('days', MyBB::INPUT_INT);
@@ -307,8 +429,9 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 			$i = 1 - $i;
 			$bgcolor = 'trow'.($i+1);
 			$fid = $row['fid'];
+			$tid = $row['tid'];
 			$moved = explode('|', $row['closed']);
-			$thread_link = act_get_threadlink($row['tid'], $row['thread_subject']);
+			$thread_link = act_get_threadlink($tid, $row['thread_subject']);
 			$thread_username_link = act_get_usernamelink($row['thread_uid'], $row['thread_username']);
 			$thread_date = my_date('normal', $row['thread_dateline']);
 			$num_posts_fmt = my_number_format($row['num_posts']);
@@ -337,7 +460,7 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 					$last_read = $read_cutoff;
 				}
 			} else {
-				$last_read = my_get_array_cookie('threadread', $row['tid']);
+				$last_read = my_get_array_cookie('threadread', $tid);
 			}
 			if ($forum_reads[$fid] > $last_read) {
 				$last_read = $forum_reads[$fid];
@@ -347,7 +470,7 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 				$folder_label .= $lang->icon_new;
 				$new_class = 'subject_new';
 				$thread = array(
-					'newpostlink' => get_thread_link($row['tid'], 0, 'newpost')
+					'newpostlink' => get_thread_link($tid, 0, 'newpost')
 				);
 				eval('$gotounread = "'.$templates->get("forumdisplay_thread_gotounread").'";');
 				$unreadpost = 1;
@@ -391,7 +514,7 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 				}
 			}
 
-			eval("\$result_rows .= \"".$templates->get('activethreads_result_row', 1, 0)."\";");
+			eval('$result_rows .= "'.$templates->get('activethreads_result_row', 1, 0).'";');
 		}
 
 		$sorter = ' [<a href="'.act_make_url($days, $hours, $mins, $date, $sort, ($order == 'ascending' ? 'descending' : 'ascending'), $page).'">'.($order == 'ascending' ? 'desc' : 'asc').'</a>]';
