@@ -161,7 +161,7 @@ function act_update_create_settings($existing_setting_values = array()) {
 			'title'       => $lang->act_max_interval_in_mins_title,
 			'description' => $lang->act_max_interval_in_mins_desc,
 			'optionscode' => 'numeric',
-			'value'       => '43200' // 30 days
+			'value'       => '0'
 		),
 		'per_usergroup' => array(
 			'title'       => $lang->act_per_usergroup_title,
@@ -245,7 +245,7 @@ function act_update_create_settings($existing_setting_values = array()) {
 }
 
 function act_install_upgrade_common() {
-	global $mybb, $db, $lang, $cache;
+	global $mybb, $db, $lang, $cache, $groupscache;
 
 	$templates = array(
 		'activethreads_page'
@@ -419,7 +419,9 @@ table, td, th {
 	}
 
 	if (!$db->field_exists('act_max_interval_in_mins', 'usergroups')) {
-		$db->add_column('usergroups', 'act_max_interval_in_mins', "int(10) NOT NULL DEFAULT '1440'");
+		$db->add_column('usergroups', 'act_max_interval_in_mins', "int(10) NOT NULL DEFAULT '10080'"); // Default interval of one week.
+		$cache->update_usergroups();
+		$groupscache = $cache->read('usergroups');
 	}
 }
 
@@ -523,13 +525,16 @@ function activethreads_deactivate() {
 }
 
 function act_limits_usergroup_permission() {
-	global $mybb, $lang, $form, $form_container;
+	global $mybb, $lang, $form, $form_container, $groupscache;
 	$lang->load('activethreads');
+
+	$gid = $mybb->get_input('gid', MyBB::INPUT_INT);
+	$usergroup = $groupscache[$gid];
 
 	if ($mybb->settings[C_ACT.'_per_usergroup'] == 1) {
 		if (!empty($form_container->_title) && !empty($lang->users_permissions) && $form_container->_title == $lang->users_permissions) {
 			$act_per_usergroup_options = array(
-				"{$lang->act_max_interval_in_mins_title}<br /><small class=\"input\">{$lang->act_max_interval_in_mins_desc}</small><br />".$form->generate_numeric_field('act_max_interval_in_mins', $mybb->input['act_max_interval_in_mins'], array('id' => 'id_act_max_interval_in_mins', 'class' => 'field50', 'min' => 0)),
+				"{$lang->act_max_interval_in_mins_title}<br /><small class=\"input\">{$lang->act_max_interval_in_mins_desc}</small><br />".$form->generate_numeric_field('act_max_interval_in_mins', $usergroup['act_max_interval_in_mins'], array('id' => 'id_act_max_interval_in_mins', 'class' => 'field50', 'min' => 0)),
 			);
 
 			$form_container->output_row($lang->act_per_usergroup_permissions_heading, "", "<div class=\"group_settings_bit\">".implode("</div><div class=\"group_settings_bit\">", $act_per_usergroup_options)."</div>");
