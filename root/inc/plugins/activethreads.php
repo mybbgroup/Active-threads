@@ -187,6 +187,18 @@ function act_update_create_settings($existing_setting_values = array()) {
 			'optionscode' => 'numeric',
 			'value'       => '0'
 		),
+		'default_sort_field' => array(
+			'title'       => $lang->act_default_sort_field_title,
+			'description' => $lang->act_default_sort_field_desc,
+			'optionscode' => "select\nnum_posts={$lang->act_default_sort_field_num_posts}\nmin_dateline={$lang->act_default_sort_field_date_earliest}\nmax_dateline={$lang->act_default_sort_field_date_latest}\nthread_subject={$lang->act_default_sort_field_thread_subject}\nthread_username={$lang->act_default_sort_field_thread_username}\nthread_dateline={$lang->act_default_sort_field_thread_dateline}\nforum_name={$lang->act_default_sort_field_forum_name}\nmin_username={$lang->act_default_sort_field_min_username}\nmax_username={$lang->act_default_sort_field_max_username}",
+			'value'       => 'num_posts'
+		),
+		'default_sort_direction' => array(
+			'title'       => $lang->act_default_sort_direction_title,
+			'description' => $lang->act_default_sort_direction_desc,
+			'optionscode' => "select\nascending={$lang->act_ascending}\ndescending={$lang->act_descending}",
+			'value'       => 'descending'
+		),
 		'display_thread_avatar' => array(
 			'title'       => $lang->act_display_thread_avatar_title,
 			'description' => $lang->act_display_thread_avatar_desc,

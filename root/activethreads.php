@@ -202,7 +202,13 @@ if ($active_plugins && $active_plugins['activethreads']) {
 	$date = $mybb->get_input('date');
 	$page = $mybb->get_input('page', MyBB::INPUT_INT);
 	$sort = $mybb->get_input('sort');
+	if (!$sort) {
+		$sort = $mybb->settings[C_ACT.'_default_sort_field'];
+	}
 	$order = $mybb->get_input('order');
+	if (!$order) {
+		$order = $mybb->settings[C_ACT.'_default_sort_direction'];
+	}
 
 	switch ($sort) {
 	case 'min_dateline':
