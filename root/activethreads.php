@@ -192,9 +192,21 @@ if ($active_plugins && $active_plugins['activethreads']) {
 		exit;
 	}
 
-	$max_interval = $mybb->settings[C_ACT.'_per_usergroup'] == '1'
-	                  ? $mybb->usergroup['act_max_interval_in_mins']
-	                  : $mybb->settings[C_ACT.'_max_interval_in_mins'];
+	if ($mybb->settings[C_ACT.'_per_usergroup'] == '1') {
+		// $mybb->usergroup['act_max_interval_in_mins'] gives us the maximum value of this
+		// setting of all of the usergroups to which the user belongs, but, semantically,
+		// for this setting, 0 is maximum, so we need to check manually whether any of the
+		// user's usergroups have this setting set to its maximum of 0.
+		$groupscache = $cache->read('usergroups');
+		$unlimited = false;
+		foreach (explode(',', $mybb->usergroup['all_usergroups']) as $gid) {
+			if ($groupscache[$gid]['act_max_interval_in_mins'] == 0) {
+				$unlimited = true;
+				break;
+			}
+		}
+		$max_interval = $unlimited ? 0 : $mybb->usergroup['act_max_interval_in_mins'];
+	} else	$max_interval = $mybb->settings[C_ACT.'_max_interval_in_mins'];
 
 	$days = $mybb->get_input('days', MyBB::INPUT_INT);
 	$hours = $mybb->get_input('hours', MyBB::INPUT_INT);
