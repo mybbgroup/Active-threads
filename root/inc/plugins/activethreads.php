@@ -22,9 +22,10 @@ if (!defined('IN_MYBB')) {
 
 define('C_ACT', str_replace('.php', '', basename(__FILE__)));
 
-if (!defined('IN_ADMINCP')) {
-	$plugins->add_hook('global_start', 'activethreads_global_start');
-}
+if (defined('IN_ADMINCP')) {
+	$plugins->add_hook('admin_formcontainer_end', 'act_limits_usergroup_permission');
+	$plugins->add_hook('admin_user_groups_edit_commit', 'act_limits_usergroup_permission_commit');
+} else	$plugins->add_hook('global_start', 'activethreads_global_start');
 
 function activethreads_global_start() {
 	global $lang;
@@ -104,6 +105,10 @@ function activethreads_uninstall() {
 		rebuild_settings();
 	}
 
+	if ($db->field_exists('act_max_interval_in_mins', 'usergroups')) {
+		$db->drop_column('usergroups', 'act_max_interval_in_mins');
+	}
+
 	$lrs_plugins = $cache->read('lrs_plugins');
 	unset($lrs_plugins[C_ACT]);
 	$cache->update('lrs_plugins', $lrs_plugins);
@@ -157,6 +162,12 @@ function act_update_create_settings($existing_setting_values = array()) {
 			'description' => $lang->act_max_interval_in_mins_desc,
 			'optionscode' => 'numeric',
 			'value'       => '43200' // 30 days
+		),
+		'per_usergroup' => array(
+			'title'       => $lang->act_per_usergroup_title,
+			'description' => $lang->act_per_usergroup_desc,
+			'optionscode' => 'yesno',
+			'value'       => '1',
 		),
 		'display_thread_avatar' => array(
 			'title'       => $lang->act_display_thread_avatar_title,
@@ -376,6 +387,10 @@ table, td, th {
 			$db->insert_query('templates', $template_row);
 		}
 	}
+
+	if (!$db->field_exists('act_max_interval_in_mins', 'usergroups')) {
+		$db->add_column('usergroups', 'act_max_interval_in_mins', "int(10) NOT NULL DEFAULT '1440'");
+	}
 }
 
 function activethreads_activate() {
@@ -475,4 +490,25 @@ function activethreads_deactivate() {
 			update_theme_stylesheet_list($theme['tid']);
 		}
 	}
+}
+
+function act_limits_usergroup_permission() {
+	global $mybb, $lang, $form, $form_container;
+	$lang->load('activethreads');
+
+	if ($mybb->settings[C_ACT.'_per_usergroup'] == 1) {
+		if (!empty($form_container->_title) && !empty($lang->users_permissions) && $form_container->_title == $lang->users_permissions) {
+			$act_per_usergroup_options = array(
+				"{$lang->act_max_interval_in_mins_title}<br /><small class=\"input\">{$lang->act_max_interval_in_mins_desc}</small><br />".$form->generate_numeric_field('act_max_interval_in_mins', $mybb->input['act_max_interval_in_mins'], array('id' => 'id_act_max_interval_in_mins', 'class' => 'field50', 'min' => 0)),
+			);
+
+			$form_container->output_row($lang->act_per_usergroup_permissions_heading, "", "<div class=\"group_settings_bit\">".implode("</div><div class=\"group_settings_bit\">", $act_per_usergroup_options)."</div>");
+		}
+	}
+
+}
+
+function act_limits_usergroup_permission_commit() {
+	global $db, $mybb, $updated_group;
+	$updated_group['act_max_interval_in_mins'] = $db->escape_string((int)$mybb->input['act_max_interval_in_mins']);
 }

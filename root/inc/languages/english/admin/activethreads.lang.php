@@ -10,3 +10,6 @@ $l['act_display_earliestpost_avatar_title'] = 'Display earliest post\'s user ava
 $l['act_display_earliestpost_avatar_desc' ] = 'If yes, the avatar of the user of each thread\'s earliest post will be shown in the listing';
 $l['act_display_latestpost_avatar_title'] = 'Display latest post\'s user avatar?';
 $l['act_display_latestpost_avatar_desc' ] = 'If yes, the avatar of the user of each thread\'s latest post will be shown in the listing';
+$l['act_per_usergroup_permissions_heading'] = 'Active Threads Limits';
+$l['act_per_usergroup_title'              ] = 'Enable per-usergroup interval setting overrides';
+$l['act_per_usergroup_desc'               ] = 'When enabled, the "Maximum allowed interval (minutes)" setting is taken from the user\'s usergroup rather than from the global setting above. This setting can be customised for each usergroup in the ACP under Users & Groups -> <a href=\"index.php?module=user-groups\">Groups</a> -> [Selected group] -> Users and Permissions [tab] -> Active Threads Limits [heading].';

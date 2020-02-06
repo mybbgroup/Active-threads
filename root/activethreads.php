@@ -193,7 +193,9 @@ if ($active_plugins && $active_plugins['activethreads']) {
 		exit;
 	}
 
-	$max_interval = $mybb->settings[C_ACT.'_max_interval_in_mins'];
+	$max_interval = $mybb->settings[C_ACT.'_per_usergroup'] == '1'
+	                  ? $mybb->usergroup['act_max_interval_in_mins']
+	                  : $mybb->settings[C_ACT.'_max_interval_in_mins'];
 
 	$days = $mybb->get_input('days', MyBB::INPUT_INT);
 	$hours = $mybb->get_input('hours', MyBB::INPUT_INT);
