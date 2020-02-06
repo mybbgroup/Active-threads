@@ -19,7 +19,6 @@ define('IN_MYBB', 1);
 require_once './global.php';
 
 define('THIS_SCRIPT', 'activethreads.php');
-define('ACT_NUM_DAYS', 14);
 define('ACT_ITEMS_PER_PAGE', 20);
 
 if (!isset($lang->activethreads)) {
@@ -223,16 +222,28 @@ if ($active_plugins && $active_plugins['activethreads']) {
 		$order = 'descending';
 	}
 
+	$using_defaults = false;
 	if ($days == 0 && $hours == 0 && $mins == 0) {
-		if ($max_interval > 0 && ACT_NUM_DAYS * 24 * 60 > $max_interval) {
-			$mins = $max_interval;
-		} else	$days = ACT_NUM_DAYS;
+		$days = $mybb->settings[C_ACT.'_default_days'];
+		$hours = $mybb->settings[C_ACT.'_default_hours'];
+		$mins = $mybb->settings[C_ACT.'_default_mins'];
+		$using_defaults = true;
 	}
+
 	if (!$page) $page = 1;
 
 	$mins_before = $days;
 	$mins_before = $mins_before * 24 + $hours;
 	$mins_before = $mins_before * 60 + $mins;
+
+	if ($max_interval > 0 && $mins_before > $max_interval) {
+		if ($using_defaults) {
+			$mins_before = $max_interval;
+			$mins = $mins_before;
+			$days = $hours = 0;
+		} else	error($lang->sprintf($lang->act_err_excess_int, my_number_format($mins_before), my_number_format($max_interval)));
+	}
+	$secs_before = $mins_before * 60;
 
 	if ($date) {
 		if ($mybb->user['dst'] == 1) {
@@ -248,12 +259,7 @@ if ($active_plugins && $active_plugins['activethreads']) {
 		$date = 'Now';
 		$date_for_title = $lang->act_now;
 	}
-	$date_prior = my_date('normal', $ts_epoch - $mins_before * 60);
-
-	if ($max_interval > 0 && $mins_before > $max_interval) {
-		error($lang->sprintf($lang->act_err_excess_int, my_number_format($mins_before), my_number_format($max_interval)));
-	}
-	$secs_before = $mins_before * 60;
+	$date_prior = my_date('normal', $ts_epoch - $secs_before);
 
 	$conds = 'p.dateline >= '.($ts_epoch - $secs_before).' AND p.dateline <= '.$ts_epoch;
 

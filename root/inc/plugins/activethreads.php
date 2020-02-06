@@ -169,6 +169,24 @@ function act_update_create_settings($existing_setting_values = array()) {
 			'optionscode' => 'yesno',
 			'value'       => '1',
 		),
+		'default_days' => array(
+			'title'       => $lang->act_default_days_title,
+			'description' => $lang->act_default_days_desc,
+			'optionscode' => 'numeric',
+			'value'       => '7'
+		),
+		'default_hours' => array(
+			'title'       => $lang->act_default_hours_title,
+			'description' => $lang->act_default_hours_desc,
+			'optionscode' => 'numeric',
+			'value'       => '0'
+		),
+		'default_mins' => array(
+			'title'       => $lang->act_default_mins_title,
+			'description' => $lang->act_default_mins_desc,
+			'optionscode' => 'numeric',
+			'value'       => '0'
+		),
 		'display_thread_avatar' => array(
 			'title'       => $lang->act_display_thread_avatar_title,
 			'description' => $lang->act_display_thread_avatar_desc,

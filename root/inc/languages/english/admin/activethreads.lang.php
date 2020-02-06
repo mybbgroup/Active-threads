@@ -13,3 +13,9 @@ $l['act_display_latestpost_avatar_desc' ] = 'If yes, the avatar of the user of e
 $l['act_per_usergroup_permissions_heading'] = 'Active Threads Limits';
 $l['act_per_usergroup_title'              ] = 'Enable per-usergroup interval setting overrides';
 $l['act_per_usergroup_desc'               ] = 'When enabled, the "Maximum allowed interval (minutes)" setting is taken from the user\'s usergroup rather than from the global setting above. This setting can be customised for each usergroup in the ACP under Users & Groups -> <a href=\"index.php?module=user-groups\">Groups</a> -> [Selected group] -> Users and Permissions [tab] -> Active Threads Limits [heading].';
+$l['act_default_days_title'               ] = 'Default days';
+$l['act_default_days_desc'                ] = 'The default for the "days" component of the Active Threads interval when no parameters are specified.';
+$l['act_default_hours_title'              ] = 'Default hours';
+$l['act_default_hours_desc'               ] = 'The default for the "hours" component of the Active Threads interval when no parameters are specified.';
+$l['act_default_mins_title'               ] = 'Default minutes';
+$l['act_default_mins_desc'                ] = 'The default for the "minutes" component of the Active Threads interval when no parameters are specified.';
