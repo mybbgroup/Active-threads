@@ -45,17 +45,28 @@ function activethreads_info() {
 	$ret = array(
 		'name'          => $lang->act_name,
 		'description'   => $lang->act_desc,
-		'website'       => '',
+		'website'       => 'https://github.com/lairdshaw/MyBB-active-threads-plugin',
 		'author'        => 'Laird Shaw',
-		'authorsite'    => '',
-		'version'       => '1.2.5',
+		'authorsite'    => 'https://github.com/lairdshaw',
+		'version'       => '1.2.6',
 		// Constructed by converting each digit of 'version' above into two digits (zero-padded if necessary),
 		// then concatenating them, then removing any leading zero(es) to avoid the value being interpreted as octal.
-		'version_code'  => '10205',
+		'version_code'  => '10206',
 		'guid'          => '',
 		'codename'      => C_ACT,
 		'compatibility' => '18*'
 	);
+
+	$ret['description'] .= <<<EOF
+<div style="float: right;">
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+<input type="hidden" name="cmd" value="_s-xclick" />
+<input type="hidden" name="hosted_button_id" value="UDYQF5HJKQDUU" />
+<input type="image" src="https://www.paypalobjects.com/en_AU/i/btn/btn_donate_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
+<img alt="" border="0" src="https://www.paypal.com/en_AU/i/scr/pixel.gif" width="1" height="1" />
+</form>
+</div>
+EOF;
 
 	return $ret;
 }
