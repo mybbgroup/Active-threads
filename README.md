@@ -53,7 +53,7 @@ Secondly, to view, in order from most recent to earliest, the latest post to all
 
 4. *Configure settings*.
 
-   If (presumably for performance reasons) you wish to limit the maximum configurable period in seconds, then navigate in the ACP to Settings -> Plugin Settings -> Active Threads and enter your preferred value (one week in seconds, for example - a plausible limit for a large board - is 604,800).
+   Navigate in the ACP to Settings -> Plugin Settings -> Active Threads and configure your preferred value for the settings.
 
 That's it. You should now see the "View Active Threads" link in your forum's header. In any case, you should be able to view the plugin's page at http://your-forum.com/your-forum-root-dir/activethreads.php
 
