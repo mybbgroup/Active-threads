@@ -257,8 +257,10 @@ if ($active_plugins && $active_plugins['activethreads']) {
 	if ($max_interval > 0 && $mins_before > $max_interval) {
 		if ($using_defaults) {
 			$mins_before = $max_interval;
-			$mins = $mins_before;
-			$days = $hours = 0;
+			$mins = $mins_before % 60;
+			$hours1 = ($mins_before - $mins) / 60;
+			$hours = $hours1 % 24;
+			$days = ($hours1 - $hours) / 24;
 		} else	error($lang->sprintf($lang->act_err_excess_int, my_number_format($mins_before), my_number_format($max_interval)));
 	}
 	$secs_before = $mins_before * 60;
