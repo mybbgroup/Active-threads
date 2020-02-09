@@ -316,24 +316,24 @@ table, td, th {
 </thead>
 <tbody>
 	<tr>
-		<td><input type="text" name="days" value="$days" size="5" style="text-align: right;"/></td>
-		<td><input type="text" name="hours" value="$hours" size="5" style="text-align: right;" /></td>
-		<td><input type="text" name="mins" value="$mins" size="5" style="text-align: right;" /></td>
-		<td><input type="text" name="date" value="$date" size="16" style="text-align: right;" title="{$act_before_date_tooltip}" /></td>
+		<td><input type="text" name="days" value="{$days}" size="5" style="text-align: right;"/></td>
+		<td><input type="text" name="hours" value="{$hours}" size="5" style="text-align: right;" /></td>
+		<td><input type="text" name="mins" value="{$mins}" size="5" style="text-align: right;" /></td>
+		<td><input type="text" name="date" value="{$date}" size="16" style="text-align: right;" title="{$act_before_date_tooltip}" /></td>
 		<td>
 			<input type="radio" name="order" value="ascending" id="sort.asc"{$asc_checked} /><label for ="sort.asc">{$lang->act_asc}</label><br />
 			<input type="radio" name="order" value="descending" id="sort.desc"{$desc_checked} /><label for ="sort.desc">{$lang->act_desc}</label>
 			<br />
 			<select name="sort">
-				<option value="num_posts"$num_posts_selected>{$lang->act_sort_by_num_posts}</option>
-				<option value="min_dateline"$min_dateline_selected>{$lang->act_sort_by_earliest}</option>
-				<option value="max_dateline"$max_dateline_selected>{$lang->act_sort_by_latest}</option>
-				<option value="thread_subject"$thread_subject_selected>{$lang->act_sort_by_thread_subject}</option>
-				<option value="thread_username"$thread_username_selected>{$lang->act_sort_by_thread_username}</option>
-				<option value="thread_dateline"$thread_dateline_selected>{$lang->act_sort_by_thread_dateline}</option>
-				<option value="forum_name"$forum_name_selected>{$lang->act_sort_by_forum_name}</option>
-				<option value="min_username"$min_username_selected>{$lang->act_sort_by_min_username}</option>
-				<option value="max_username"$max_username_selected>{$lang->act_sort_by_max_username}</option>
+				<option value="num_posts"{$num_posts_selected}>{$lang->act_sort_by_num_posts}</option>
+				<option value="min_dateline"{$min_dateline_selected}>{$lang->act_sort_by_earliest}</option>
+				<option value="max_dateline"{$max_dateline_selected}>{$lang->act_sort_by_latest}</option>
+				<option value="thread_subject"{$thread_subject_selected}>{$lang->act_sort_by_thread_subject}</option>
+				<option value="thread_username"{$thread_username_selected}>{$lang->act_sort_by_thread_username}</option>
+				<option value="thread_dateline"{$thread_dateline_selected}>{$lang->act_sort_by_thread_dateline}</option>
+				<option value="forum_name"{$forum_name_selected}>{$lang->act_sort_by_forum_name}</option>
+				<option value="min_username"{$min_username_selected}>{$lang->act_sort_by_min_username}</option>
+				<option value="max_username"{$max_username_selected}>{$lang->act_sort_by_max_username}</option>
 			</select>
 		</td>
 	</tr>
@@ -346,13 +346,13 @@ table, td, th {
 </html>',
 		'activethreads_result_row' => '
 	<tr class="inline_row">
-		<td align="center" class="$bgcolor" width="2%"><span class="thread_status {$folder}" title="{$folder_label}">&nbsp;</span></td>
+		<td align="center" class="{$bgcolor}" width="2%"><span class="thread_status {$folder}" title="{$folder_label}">&nbsp;</span></td>
 		<td align="center" class="{$bgcolor}" width="2%">{$icon}</td>
-		<td class="$bgcolor forumdisplay_regular" style="text-align: left;"><div style="float: left;">{$threadauthor_avatar}</div><div style="margin-left: {$margin_thread}px;">{$prefix} $gotounread$threadprefix_disp<span class="$new_class">$thread_link</span><div><span class="smalltext author">$threadauthor_link</span> <span class="smalltext" style="float: right;">$thread_date</span></div></div></td>
-		<td class="$bgcolor"><a href="{$mybb->settings[\'bburl\']}/activethreads.php?action=whoposted&amp;tid={$tid}&amp;min_dateline={$row[\'min_dateline\']}&amp;max_dateline={$row[\'max_dateline\']}" onclick="activethreads_whoPosted({$tid}, {$row[\'min_dateline\']}, {$row[\'max_dateline\']}); return false;">$num_posts_fmt</a></td>
-		<td class="$bgcolor" style="text-align: left;">$forum_links</td>
-		<td class="$bgcolor" style="text-align: right;"><div style="float: right">{$earliestpost_avatar}</div><div style="margin-right: {$margin_earliest}px;">{$min_post_date_link}<div class="smalltext"><span class="author">{$earliestposter_username_link}</span></div></div></td>
-		<td class="$bgcolor" style="text-align: right;"><div style="float: right">{$latestpost_avatar}</div><div style="margin-right: {$margin_latest}px;">{$max_post_date_link}<div class="smalltext"><span class="author">{$latestposter_username_link}</span></div></div></td>
+		<td class="{$bgcolor} forumdisplay_regular" style="text-align: left;"><div style="float: left;">{$threadauthor_avatar}</div><div style="margin-left: {$margin_thread}px;">{$prefix} {$gotounread}{$threadprefix_disp}<span class="{$new_class}">{$thread_link}</span><div><span class="smalltext author">{$threadauthor_link}</span> <span class="smalltext" style="float: right;">{$thread_date}</span></div></div></td>
+		<td class="{$bgcolor}"><a href="{$mybb->settings[\'bburl\']}/activethreads.php?action=whoposted&amp;tid={$tid}&amp;min_dateline={$row[\'min_dateline\']}&amp;max_dateline={$row[\'max_dateline\']}" onclick="activethreads_whoPosted({$tid}, {$row[\'min_dateline\']}, {$row[\'max_dateline\']}); return false;">{$num_posts_fmt}</a></td>
+		<td class="{$bgcolor}" style="text-align: left;">{$forum_links}</td>
+		<td class="{$bgcolor}" style="text-align: right;"><div style="float: right">{$earliestpost_avatar}</div><div style="margin-right: {$margin_earliest}px;">{$earliestpost_date_link}<div class="smalltext"><span class="author">{$earliestposter_username_link}</span></div></div></td>
+		<td class="{$bgcolor}" style="text-align: right;"><div style="float: right">{$latestpost_avatar}</div><div style="margin-right: {$margin_latest}px;">{$latestpost_date_link}<div class="smalltext"><span class="author">{$latestposter_username_link}</span></div></div></td>
 	</tr>',
 		'activethreads_results' =>
 '<table class="tborder clear">
@@ -417,6 +417,12 @@ table, td, th {
 		'activethreads_threadauthor_username_link'   => '<a href="{$threadauthor_username_url}">{$threadauthor_username}</a>',
 		'activethreads_earliestposter_username_link' => '<a href="{$earliestposter_username_url}">{$earliestposter_username}</a>',
 		'activethreads_latestposter_username_link'   => '<a href="{$latestposter_username_url}">{$latestposter_username}</a>',
+		'activethreads_thread_link'                  => '<a href="{$thread_url}">{$thread_subject}</a>',
+		'activethreads_earliestpost_date_link'       => '<a href="{$earliestpost_date_url}">$earliestpost_date</a>',
+		'activethreads_latestpost_date_link'         => '<a href="{$latestpost_date_url}">$latestpost_date</a>',
+		'activethreads_forum_separator'              => '&raquo;',
+		'activethreads_forum_link'                   => '<a href="{$forum_url}">{$forum_name}</a>',
+		'activethreads_forum_separator_last'         => '<br /><img src="images/nav_bit.png" alt="" />',
 	);
 
 	$info = activethreads_info();

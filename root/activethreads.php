@@ -25,32 +25,6 @@ if (!isset($lang->activethreads)) {
 	$lang->load('activethreads');
 }
 
-function act_get_link($url, $text) {
-	return '<a href="'.htmlspecialchars_uni($url).'">'.htmlspecialchars_uni($text).'</a>';
-}
-
-function act_get_forumlink($fid, $name) {
-	return act_get_link(get_forum_link($fid), $name);
-}
-
-function act_get_threadlink($tid, $name) {
-	return act_get_link(get_thread_link($tid), $name);
-}
-
-function act_get_postlink($pid, $name) {
-	return act_get_link(get_post_link($pid).'#pid'.$pid, $name);
-}
-
-function act_get_flinks($parentlist, $forum_names) {
-	$flinks = '';
-	foreach (explode(',', $parentlist) as $fid) {
-		if ($flinks ) $flinks .= ' &raquo; ';
-		$flinks .= act_get_forumlink($fid, $forum_names[$fid]);
-	}
-
-	return $flinks;
-}
-
 function act_make_url($days, $hours, $mins, $date, $sort, $order, $page, $encode = true) {
 	$ret = "activethreads.php?days=$days&hours=$hours&mins=$mins&date=".urlencode($date)."&sort=$sort&order=$order&page=$page";
 	if ($encode) {
@@ -480,7 +454,9 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 			$fid = $row['fid'];
 			$tid = $row['tid'];
 			$moved = explode('|', $row['closed']);
-			$thread_link = act_get_threadlink($tid, $row['thread_subject']);
+			$thread_url = get_thread_link($tid);
+			$thread_subject = htmlspecialchars_uni($row['thread_subject']);
+			eval('$thread_link = "'.$templates->get('activethreads_thread_link').'";');
 			$threadauthor_username = $mybb->settings[C_ACT.'_format_threadauthor_username']
 			                     ? format_name($row['thread_username'], $row['thread_usergroup'])
 			                     : htmlspecialchars_uni($row['thread_username']);
@@ -488,18 +464,32 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 			eval('$threadauthor_link = "'.$templates->get('activethreads_threadauthor_username_link').'";');
 			$thread_date = my_date('normal', $row['thread_dateline']);
 			$num_posts_fmt = my_number_format($row['num_posts']);
+
+			$forum_links = '';
 			$fids = explode(',', $row['parentlist']);
 			$fid_last = array_pop($fids);
-			$forum_links = act_get_flinks(implode(',', $fids), $forum_names);
-			$forum_links .= '<br /><img src="images/nav_bit.png" alt="" />';
-			$forum_links .= act_get_forumlink($fid_last, $forum_names[$fid_last]);
-			$min_post_date_link = act_get_postlink($row['min_pid'], my_date('normal', $row['min_dateline']));
+			foreach ($fids as $fid) {
+				if ($forum_links) eval('$forum_links .= "'.$templates->get('activethreads_forum_separator').'";');
+				$forum_url = get_forum_link($fid);
+				$forum_name = htmlspecialchars_uni($forum_names[$fid]);
+				eval('$forum_links .= "'.$templates->get('activethreads_forum_link').'";');
+			}
+			eval('$forum_links .= "'.$templates->get('activethreads_forum_separator_last').'";');
+			$forum_url = get_forum_link($fid_last);
+			$forum_name = htmlspecialchars_uni($forum_names[$fid_last]);
+			eval('$forum_links .= "'.$templates->get('activethreads_forum_link').'";');
+
+			$earliestpost_url = get_post_link($row['min_pid']).'#pid'.$row['min_pid'];
+			$earliestpost_date = my_date('normal', $row['min_dateline']);
+			eval('$earliestpost_date_link = "'.$templates->get('activethreads_earliestpost_date_link').'";');
 			$earliestposter_username = $mybb->settings[C_ACT.'_format_earliestposter_username']
 			                     ? format_name($row['min_username'], $row['min_usergroup'])
 			                     : htmlspecialchars_uni($row['min_username']);
 			$earliestposter_username_url = get_profile_link($row['min_uid']);
 			eval('$earliestposter_username_link = "'.$templates->get('activethreads_earliestposter_username_link').'";');
-			$max_post_date_link = act_get_postlink($row['max_pid'], my_date('normal', $row['max_dateline']));
+			$latestpost_url = get_post_link($row['max_pid']).'#pid'.$row['max_pid'];
+			$latestpost_date = my_date('normal', $row['max_dateline']);
+			eval('$latestpost_date_link = "'.$templates->get('activethreads_latestpost_date_link').'";');
 			$latestposter_username = $mybb->settings[C_ACT.'_format_latestposter_username']
 			                     ? format_name($row['max_username'], $row['max_usergroup'])
 			                     : htmlspecialchars_uni($row['max_username']);
