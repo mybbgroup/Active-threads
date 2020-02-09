@@ -411,9 +411,9 @@ table, td, th {
 {$footer}
 </body>
 </html>',
-		'activethreads_threadauthor_avatar'  => '<img src="{$useravatar[\'image\']}" alt="" {$useravatar[\'width_height\']} />',
-		'activethreads_earliestposter_avatar' => '<img src="{$useravatar[\'image\']}" alt="" {$useravatar[\'width_height\']} />',
-		'activethreads_latestposter_avatar'   => '<img src="{$useravatar[\'image\']}" alt="" {$useravatar[\'width_height\']} />',
+		'activethreads_threadauthor_avatar'  => '<a href="{$threadauthor_username_url}"><img src="{$useravatar[\'image\']}" alt="" {$useravatar[\'width_height\']} /></a>',
+		'activethreads_earliestposter_avatar' => '<a href="{$earliestposter_username_url}"><img src="{$useravatar[\'image\']}" alt="" {$useravatar[\'width_height\']} /></a>',
+		'activethreads_latestposter_avatar'   => '<a href="{$latestposter_username_url}"><img src="{$useravatar[\'image\']}" alt="" {$useravatar[\'width_height\']} /></a>',
 		'activethreads_threadauthor_username_link'   => '<a href="{$threadauthor_username_url}">{$threadauthor_username}</a>',
 		'activethreads_earliestposter_username_link' => '<a href="{$earliestposter_username_url}">{$earliestposter_username}</a>',
 		'activethreads_latestposter_username_link'   => '<a href="{$latestposter_username_url}">{$latestposter_username}</a>',
