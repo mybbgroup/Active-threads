@@ -468,10 +468,10 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 			$forum_links = '';
 			$fids = explode(',', $row['parentlist']);
 			$fid_last = array_pop($fids);
-			foreach ($fids as $fid) {
+			foreach ($fids as $fid2) {
 				if ($forum_links) eval('$forum_links .= "'.$templates->get('activethreads_forum_separator').'";');
-				$forum_url = get_forum_link($fid);
-				$forum_name = htmlspecialchars_uni($forum_names[$fid]);
+				$forum_url = get_forum_link($fid2);
+				$forum_name = htmlspecialchars_uni($forum_names[$fid2]);
 				eval('$forum_links .= "'.$templates->get('activethreads_forum_link').'";');
 			}
 			eval('$forum_links .= "'.$templates->get('activethreads_forum_separator_last').'";');
@@ -506,8 +506,6 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 				$folder_label .= $lang->icon_dot;
 			}
 			$gotounread = '';
-			$isnew = 0;
-			$donenew = 0;
 			if ($mybb->settings['threadreadcut'] > 0 && $mybb->user['uid'] && $row['thread_lastpost'] > $forum_reads[$fid]) {
 				if (!empty($row['lastread'])) {
 					$last_read = $row['lastread'];
