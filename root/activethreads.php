@@ -37,10 +37,6 @@ function act_get_threadlink($tid, $name) {
 	return act_get_link(get_thread_link($tid), $name);
 }
 
-function act_get_usernamelink($uid, $name) {
-	return act_get_link(get_profile_link($uid), $name);
-}
-
 function act_get_postlink($pid, $name) {
 	return act_get_link(get_post_link($pid).'#pid'.$pid, $name);
 }
@@ -310,6 +306,7 @@ if ($active_plugins && $active_plugins['activethreads']) {
             t.dateline AS thread_dateline,
             uthr.uid AS thread_uid,
             uthr.username AS thread_username,
+            uthr.usergroup AS thread_usergroup,
             t.closed AS thread_closed,
             t.lastpost AS thread_lastpost,
             t.replies AS thread_replies,
@@ -340,6 +337,7 @@ SELECT mainq.tid,
        mainq.thread_subject,
        mainq.thread_dateline,
        mainq.thread_uid,
+       mainq.thread_usergroup,
        mainq.thread_username,
        mainq.thread_lastpost,
        mainq.thread_replies,
@@ -357,11 +355,13 @@ SELECT mainq.tid,
        pmin.subject AS min_subject,
        pmin.dateline AS min_dateline,
        umin.username AS min_username,
+       umin.usergroup AS min_usergroup,
        mainq.max_pid,
        pmax.uid AS max_uid,
        pmax.subject AS max_subject,
        pmax.dateline AS max_dateline,
-       umax.username AS max_username
+       umax.username AS max_username,
+       umax.usergroup AS max_usergroup
 FROM
 ($inner_sql) AS mainq
 INNER JOIN mybb_posts pmax ON mainq.max_pid = pmax.pid
@@ -481,7 +481,11 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 			$tid = $row['tid'];
 			$moved = explode('|', $row['closed']);
 			$thread_link = act_get_threadlink($tid, $row['thread_subject']);
-			$thread_username_link = act_get_usernamelink($row['thread_uid'], $row['thread_username']);
+			$threadauthor_username = $mybb->settings[C_ACT.'_format_threadauthor_username']
+			                     ? format_name($row['thread_username'], $row['thread_usergroup'])
+			                     : htmlspecialchars_uni($row['thread_username']);
+			$threadauthor_username_url = get_profile_link($row['thread_uid']);
+			eval('$threadauthor_link = "'.$templates->get('activethreads_threadauthor_username_link').'";');
 			$thread_date = my_date('normal', $row['thread_dateline']);
 			$num_posts_fmt = my_number_format($row['num_posts']);
 			$fids = explode(',', $row['parentlist']);
@@ -490,9 +494,17 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 			$forum_links .= '<br /><img src="images/nav_bit.png" alt="" />';
 			$forum_links .= act_get_forumlink($fid_last, $forum_names[$fid_last]);
 			$min_post_date_link = act_get_postlink($row['min_pid'], my_date('normal', $row['min_dateline']));
-			$min_post_username_link = act_get_usernamelink($row['min_uid'], $row['min_username']);
+			$earliestposter_username = $mybb->settings[C_ACT.'_format_earliestposter_username']
+			                     ? format_name($row['min_username'], $row['min_usergroup'])
+			                     : htmlspecialchars_uni($row['min_username']);
+			$earliestposter_username_url = get_profile_link($row['min_uid']);
+			eval('$earliestposter_username_link = "'.$templates->get('activethreads_earliestposter_username_link').'";');
 			$max_post_date_link = act_get_postlink($row['max_pid'], my_date('normal', $row['max_dateline']));
-			$max_post_username_link = act_get_usernamelink($row['max_uid'], $row['max_username']);
+			$latestposter_username = $mybb->settings[C_ACT.'_format_latestposter_username']
+			                     ? format_name($row['max_username'], $row['max_usergroup'])
+			                     : htmlspecialchars_uni($row['max_username']);
+			$latestposter_username_url = get_profile_link($row['max_uid']);
+			eval('$latestposter_username_link = "'.$templates->get('activethreads_latestposter_username_link').'";');
 
 			// The below logic for determining the folder image, icon and whether to show an "unread" arrow
 			// has been adapted from code in inc/forumdisplay.php.
@@ -574,10 +586,10 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 				$memprofile = get_user($row['thread_uid']);
 				$useravatar = format_avatar($memprofile['avatar']);
 				$useravatar['width_height'] = $dims;
-				eval('$thread_avatar = "'.$templates->get('activethreads_threadstarter_avatar').'";');
+				eval('$threadauthor_avatar = "'.$templates->get('activethreads_threadauthor_avatar').'";');
 				$margin_thread = $avatar_margin;
 			} else {
-				$thread_avatar = '';
+				$threadauthor_avatar = '';
 				$margin_thread = 0;
 			}
 			if ($settings[C_ACT.'_display_earliestpost_avatar'] != 0) {

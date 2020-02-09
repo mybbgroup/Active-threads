@@ -135,6 +135,9 @@ function activethreads_is_installed() {
 function act_upgrade() {
 	global $db;
 
+	// Transition renamed template
+	$db->update_query('templates', array('title' => 'activethreads_threadauthor_avatar'), "title='activethreads_threadstarter_avatar'");
+
 	// Update the master templates.
 	act_install_upgrade_common();
 
@@ -225,6 +228,24 @@ function act_update_create_settings($existing_setting_values = array()) {
 		'display_latestpost_avatar' => array(
 			'title'       => $lang->act_display_latestpost_avatar_title,
 			'description' => $lang->act_display_latestpost_avatar_desc,
+			'optionscode' => 'yesno',
+			'value'       => '0'
+		),
+		'format_threadauthor_username' => array(
+			'title'       => $lang->act_format_threadauthor_username_title,
+			'description' => $lang->act_format_threadauthor_username_desc,
+			'optionscode' => 'yesno',
+			'value'       => '0'
+		),
+		'format_earliestposter_username' => array(
+			'title'       => $lang->act_format_earliestposter_username_title,
+			'description' => $lang->act_format_earliestposter_username_desc,
+			'optionscode' => 'yesno',
+			'value'       => '0'
+		),
+		'format_latestposter_username' => array(
+			'title'       => $lang->act_format_latestposter_username_title,
+			'description' => $lang->act_format_latestposter_username_desc,
 			'optionscode' => 'yesno',
 			'value'       => '0'
 		),
@@ -327,11 +348,11 @@ table, td, th {
 	<tr class="inline_row">
 		<td align="center" class="$bgcolor" width="2%"><span class="thread_status {$folder}" title="{$folder_label}">&nbsp;</span></td>
 		<td align="center" class="{$bgcolor}" width="2%">{$icon}</td>
-		<td class="$bgcolor forumdisplay_regular" style="text-align: left;"><div style="float: left;">{$thread_avatar}</div><div style="margin-left: {$margin_thread}px;">{$prefix} $gotounread$threadprefix_disp<span class="$new_class">$thread_link</span><div><span class="smalltext author">$thread_username_link</span> <span class="smalltext" style="float: right;">$thread_date</span></div></div></td>
+		<td class="$bgcolor forumdisplay_regular" style="text-align: left;"><div style="float: left;">{$threadauthor_avatar}</div><div style="margin-left: {$margin_thread}px;">{$prefix} $gotounread$threadprefix_disp<span class="$new_class">$thread_link</span><div><span class="smalltext author">$threadauthor_link</span> <span class="smalltext" style="float: right;">$thread_date</span></div></div></td>
 		<td class="$bgcolor"><a href="{$mybb->settings[\'bburl\']}/activethreads.php?action=whoposted&amp;tid={$tid}&amp;min_dateline={$row[\'min_dateline\']}&amp;max_dateline={$row[\'max_dateline\']}" onclick="activethreads_whoPosted({$tid}, {$row[\'min_dateline\']}, {$row[\'max_dateline\']}); return false;">$num_posts_fmt</a></td>
 		<td class="$bgcolor" style="text-align: left;">$forum_links</td>
-		<td class="$bgcolor" style="text-align: right;"><div style="float: right">{$earliestpost_avatar}</div><div style="margin-right: {$margin_earliest}px;">{$min_post_date_link}<div class="smalltext"><span class="author">$min_post_username_link</span></div></div></td>
-		<td class="$bgcolor" style="text-align: right;"><div style="float: right">{$latestpost_avatar}</div><div style="margin-right: {$margin_latest}px;">{$max_post_date_link}<div class="smalltext"><span class="author">$max_post_username_link</span></div></div></td>
+		<td class="$bgcolor" style="text-align: right;"><div style="float: right">{$earliestpost_avatar}</div><div style="margin-right: {$margin_earliest}px;">{$min_post_date_link}<div class="smalltext"><span class="author">{$earliestposter_username_link}</span></div></div></td>
+		<td class="$bgcolor" style="text-align: right;"><div style="float: right">{$latestpost_avatar}</div><div style="margin-right: {$margin_latest}px;">{$max_post_date_link}<div class="smalltext"><span class="author">{$latestposter_username_link}</span></div></div></td>
 	</tr>',
 		'activethreads_results' =>
 '<table class="tborder clear">
@@ -390,9 +411,12 @@ table, td, th {
 {$footer}
 </body>
 </html>',
-		'activethreads_threadstarter_avatar'  => '<img src="{$useravatar[\'image\']}" alt="" {$useravatar[\'width_height\']} />',
+		'activethreads_threadauthor_avatar'  => '<img src="{$useravatar[\'image\']}" alt="" {$useravatar[\'width_height\']} />',
 		'activethreads_earliestposter_avatar' => '<img src="{$useravatar[\'image\']}" alt="" {$useravatar[\'width_height\']} />',
 		'activethreads_latestposter_avatar'   => '<img src="{$useravatar[\'image\']}" alt="" {$useravatar[\'width_height\']} />',
+		'activethreads_threadauthor_username_link'   => '<a href="{$threadauthor_username_url}">{$threadauthor_username}</a>',
+		'activethreads_earliestposter_username_link' => '<a href="{$earliestposter_username_url}">{$earliestposter_username}</a>',
+		'activethreads_latestposter_username_link'   => '<a href="{$latestposter_username_url}">{$latestposter_username}</a>',
 	);
 
 	$info = activethreads_info();
