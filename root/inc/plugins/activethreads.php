@@ -48,10 +48,10 @@ function activethreads_info() {
 		'website'       => 'https://github.com/lairdshaw/MyBB-active-threads-plugin',
 		'author'        => 'Laird Shaw',
 		'authorsite'    => 'https://github.com/lairdshaw',
-		'version'       => '1.2.7-dev',
+		'version'       => '1.2.8',
 		// Constructed by converting each digit of 'version' above into two digits (zero-padded if necessary),
 		// then concatenating them, then removing any leading zero(es) to avoid the value being interpreted as octal.
-		'version_code'  => '10207',
+		'version_code'  => '10208',
 		'guid'          => '',
 		'codename'      => C_ACT,
 		'compatibility' => '18*'
@@ -425,26 +425,19 @@ table, td, th {
 		'activethreads_forum_separator_last'         => '<br /><img src="images/nav_bit.png" alt="" />',
 	);
 
-	$info = activethreads_info();
-	$plugin_version_code = $info['version_code'];
-	// Left-pad the version code with any zero that we forbade in activethreads_info(),
-	// where it would have been interpreted as octal.
-	while (strlen($plugin_version_code) < 6) {
-		$plugin_version_code = '0'.$plugin_version_code;
-	}
-
-	// Insert templates into the Master group (sid=-2) with a (string) version set to a value that
-	// will compare greater than the current MyBB version_code. We set the version to this value so that
-	// the SQL comparison "m.version > t.version" in the query to find updated templates
-	// (in admin/modules/style/templates.php) is true for templates modified by the user:
-	// MyBB sets the version for modified templates to the value of $mybb->version_code.
 	$version = substr($mybb->version_code.'_'.$plugin_version_code, 0, 20);
 	foreach ($templates as $template_title => $template_data) {
+		// First, set the to zero the version of modified templates for this plugin.
+		// (i.e., those with an sid of other than -2). This ensures that Find Updated Templates
+		// detects them.
+		$db->update_query('templates', array('version' => 0), "title='{$template_title}' and sid <> -2");
+
+		// Now insert/update master templates with SID -2.
 		$template_row = array(
 			'title'    => $db->escape_string($template_title),
 			'template' => $db->escape_string($template_data),
 			'sid'      => '-2',
-			'version'  => $version,
+			'version'  => '1',
 			'dateline' => TIME_NOW
 		);
 
