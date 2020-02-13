@@ -457,7 +457,8 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 			$thread_url = get_thread_link($tid);
 			$max_subj_chars = $mybb->settings[C_ACT.'_max_displayed_subject_chars'];
 			if ($max_subj_chars > 0) {
-				$thread_subject = htmlspecialchars_uni(my_substr($row['thread_subject'], 0, $max_subj_chars)).'&hellip;';
+				$ellipsis = my_strlen($row['thread_subject']) > $max_subj_chars ? '&hellip;' : '';
+				$thread_subject = htmlspecialchars_uni(my_substr($row['thread_subject'], 0, $max_subj_chars)).$ellipsis;
 			} else	$thread_subject = htmlspecialchars_uni($row['thread_subject']);
 			eval('$thread_link = "'.$templates->get('activethreads_thread_link').'";');
 			$threadauthor_username = $mybb->settings[C_ACT.'_format_threadauthor_username']
