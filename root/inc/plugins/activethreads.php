@@ -48,10 +48,10 @@ function activethreads_info() {
 		'website'       => 'https://github.com/lairdshaw/MyBB-active-threads-plugin',
 		'author'        => 'Laird Shaw',
 		'authorsite'    => 'https://github.com/lairdshaw',
-		'version'       => '1.2.8',
-		// Constructed by converting each digit of 'version' above into two digits (zero-padded if necessary),
+		'version'       => '1.2.9',
+		// Constructed by converting each component of 'version' above into two digits (zero-padded if necessary),
 		// then concatenating them, then removing any leading zero(es) to avoid the value being interpreted as octal.
-		'version_code'  => '10208',
+		'version_code'  => '10209',
 		'guid'          => '',
 		'codename'      => C_ACT,
 		'compatibility' => '18*'
@@ -249,6 +249,12 @@ function act_update_create_settings($existing_setting_values = array()) {
 			'optionscode' => 'yesno',
 			'value'       => '0'
 		),
+		'max_displayed_subject_chars' => array(
+			'title'       => $lang->act_max_displayed_subject_chars_title,
+			'description' => $lang->act_max_displayed_subject_chars_desc,
+			'optionscode' => 'numeric',
+			'value'       => 0,
+		),
 	);
 
 	if (isset($existing_setting_values[C_ACT.'_max_interval_in_secs']) && !isset($existing_setting_values[C_ACT.'_max_interval_in_mins'])) {
@@ -425,7 +431,6 @@ table, td, th {
 		'activethreads_forum_separator_last'         => '<br /><img src="images/nav_bit.png" alt="" />',
 	);
 
-	$version = substr($mybb->version_code.'_'.$plugin_version_code, 0, 20);
 	foreach ($templates as $template_title => $template_data) {
 		// First, set the to zero the version of modified templates for this plugin.
 		// (i.e., those with an sid of other than -2). This ensures that Find Updated Templates
