@@ -23,11 +23,12 @@ if (!defined('IN_MYBB')) {
 define('C_ACT', str_replace('.php', '', basename(__FILE__)));
 
 if (defined('IN_ADMINCP')) {
-	$plugins->add_hook('admin_formcontainer_end', 'act_limits_usergroup_permission');
-	$plugins->add_hook('admin_user_groups_edit_commit', 'act_limits_usergroup_permission_commit');
-} else	$plugins->add_hook('global_start', 'activethreads_global_start');
+	$plugins->add_hook('admin_formcontainer_end'             , 'act_hookin__limits_usergroup_permission'       );
+	$plugins->add_hook('admin_user_groups_edit_commit'       , 'act_hookin__limits_usergroup_permission_commit');
+	$plugins->add_hook('admin_config_plugins_activate_commit', 'act_hookin__plugins_activate_commit'           );
+} else	$plugins->add_hook('global_start'                        , 'activethreads_hookin__global_start'            );
 
-function activethreads_global_start() {
+function activethreads_hookin__global_start() {
 	global $lang;
 
 	// Load the language file so that the 'act_view_act_thr' message is available for the 'header_welcomeblock_guest' template
@@ -36,7 +37,7 @@ function activethreads_global_start() {
 }
 
 function activethreads_info() {
-	global $lang, $db, $mybb;
+	global $lang, $db, $mybb, $plugins_cache, $admin_session;
 
 	if (!isset($lang->activethreads)) {
 		$lang->load(C_ACT);
@@ -48,14 +49,22 @@ function activethreads_info() {
 		'website'       => 'https://github.com/lairdshaw/MyBB-active-threads-plugin',
 		'author'        => 'Laird Shaw',
 		'authorsite'    => 'https://github.com/lairdshaw',
-		'version'       => '1.2.9',
+		'version'       => '1.2.10',
 		// Constructed by converting each component of 'version' above into two digits (zero-padded if necessary),
 		// then concatenating them, then removing any leading zero(es) to avoid the value being interpreted as octal.
-		'version_code'  => '10209',
+		'version_code'  => '10210',
 		'guid'          => '',
 		'codename'      => C_ACT,
 		'compatibility' => '18*'
 	);
+
+	if (is_array($plugins_cache) && is_array($plugins_cache['active']) && $plugins_cache['active'][C_ACT]) {
+		if (!empty($admin_session['data']['act_plugin_info_upgrade_message'])) {
+			$msg = $admin_session['data']['act_plugin_info_upgrade_message'].' '.$msg;
+			update_admin_session('act_plugin_info_upgrade_message', '');
+			$ret['description'] = "<ul><li style=\"list-style-image: url(styles/default/images/icons/success.png)\"><div class=\"success\">$msg</div></li></ul>".PHP_EOL.$ret['description'];
+		}
+	}
 
 	$ret['description'] .= <<<EOF
 <div style="float: right;">
@@ -132,14 +141,14 @@ function activethreads_is_installed() {
 	return ($db->affected_rows() > 0);
 }
 
-function act_upgrade() {
+function act_upgrade($old_version_code) {
 	global $db;
 
 	// Transition renamed template
 	$db->update_query('templates', array('title' => 'activethreads_threadauthor_avatar'), "title='activethreads_threadstarter_avatar'");
 
 	// Update the master templates.
-	act_install_upgrade_common();
+	act_install_upgrade_common($old_version_code);
 
 	// Save existing values for the plugin's settings.
 	$existing_setting_values = array();
@@ -282,12 +291,12 @@ function act_update_create_settings($existing_setting_values = array()) {
 	rebuild_settings();
 }
 
-function act_install_upgrade_common() {
+function act_install_upgrade_common($old_version_code = null, $new_version_code = null) {
 	global $mybb, $db, $lang, $cache, $groupscache;
 
 	$templates = array(
-		'activethreads_page'
-			=> '<html>
+		'activethreads_page' => array(
+			'template_data'       => '<html>
 <head>
 <title>{$mybb->settings[\'bbname\']} - {$lang->act_act_recent_threads_title_short}</title>
 {$headerinclude}
@@ -350,7 +359,10 @@ table, td, th {
 {$footer}
 </body>
 </html>',
-		'activethreads_result_row' => '
+			'version_at_last_mod' => 10206,
+		),
+		'activethreads_result_row' => array(
+			'template_data'       => '
 	<tr class="inline_row">
 		<td align="center" class="{$bgcolor}" width="2%"><span class="thread_status {$folder}" title="{$folder_label}">&nbsp;</span></td>
 		<td align="center" class="{$bgcolor}" width="2%">{$icon}</td>
@@ -360,7 +372,10 @@ table, td, th {
 		<td class="{$bgcolor}" style="text-align: right;"><div style="float: right">{$earliestpost_avatar}</div><div style="margin-right: {$margin_earliest}px;">{$earliestpost_date_link}<div class="smalltext"><span class="author">{$earliestposter_username_link}</span></div></div></td>
 		<td class="{$bgcolor}" style="text-align: right;"><div style="float: right">{$latestpost_avatar}</div><div style="margin-right: {$margin_latest}px;">{$latestpost_date_link}<div class="smalltext"><span class="author">{$latestposter_username_link}</span></div></div></td>
 	</tr>',
-		'activethreads_results' =>
+			'version_at_last_mod' => 10206,
+		),
+		'activethreads_results' => array(
+			'template_data'       =>
 '<table class="tborder clear">
 <thead>
 	<tr>
@@ -378,9 +393,12 @@ table, td, th {
 {$result_rows}
 </tbody>
 </table>',
+			'version_at_last_mod' => 10206,
+		),
 		// Largely copied from core code's misc_whoposted but with support added for a date range
 		// by calling activethreads_whoPosted() when sorting rather than MyBB.whoPosted().
-		'activethreads_whoposted' => '<div class="modal">
+		'activethreads_whoposted' => array(
+			'template_data'       => '<div class="modal">
 	<div style="overflow-y: auto; max-height: 400px;">
 <table width="100%" cellspacing="{$theme[\'borderwidth\']}" cellpadding="{$theme[\'tablespace\']}" border="0" align="center" class="tborder">
 <tr>
@@ -394,9 +412,12 @@ table, td, th {
 </table>
 </div>
 </div>',
+			'version_at_last_mod' => 10206,
+		),
 		// Largely copied from core code's misc_whoposted_page but with support added for a date range
 		// by requesting activethreads.php when sorting rather than misc.php.
-		'activethreads_whoposted_page' => '<html>
+		'activethreads_whoposted_page' => array(
+			'template_data'       => '<html>
 <head>
 <title>{$thread[\'subject\']} - {$lang->who_posted}</title>
 {$headerinclude}
@@ -417,25 +438,69 @@ table, td, th {
 {$footer}
 </body>
 </html>',
-		'activethreads_threadauthor_avatar'  => '<a href="{$threadauthor_username_url}"><img src="{$useravatar[\'image\']}" alt="" {$useravatar[\'width_height\']} /></a>',
-		'activethreads_earliestposter_avatar' => '<a href="{$earliestposter_username_url}"><img src="{$useravatar[\'image\']}" alt="" {$useravatar[\'width_height\']} /></a>',
-		'activethreads_latestposter_avatar'   => '<a href="{$latestposter_username_url}"><img src="{$useravatar[\'image\']}" alt="" {$useravatar[\'width_height\']} /></a>',
-		'activethreads_threadauthor_username_link'   => '<a href="{$threadauthor_username_url}">{$threadauthor_username}</a>',
-		'activethreads_earliestposter_username_link' => '<a href="{$earliestposter_username_url}">{$earliestposter_username}</a>',
-		'activethreads_latestposter_username_link'   => '<a href="{$latestposter_username_url}">{$latestposter_username}</a>',
-		'activethreads_thread_link'                  => '<a href="{$thread_url}">{$thread_subject}</a>',
-		'activethreads_earliestpost_date_link'       => '<a href="{$earliestpost_date_url}">{$earliestpost_date}</a>',
-		'activethreads_latestpost_date_link'         => '<a href="{$latestpost_date_url}">{$latestpost_date}</a>',
-		'activethreads_forum_separator'              => '&raquo;',
-		'activethreads_forum_link'                   => '<a href="{$forum_url}">{$forum_name}</a>',
-		'activethreads_forum_separator_last'         => '<br /><img src="images/nav_bit.png" alt="" />',
+			'version_at_last_mod' => 10206,
+		),
+		'activethreads_threadauthor_avatar'  => array(
+			'template_data'       => '<a href="{$threadauthor_username_url}"><img src="{$useravatar[\'image\']}" alt="" {$useravatar[\'width_height\']} /></a>',
+			'version_at_last_mod' => 10206,
+		),
+		'activethreads_earliestposter_avatar' => array(
+			'template_data'       => '<a href="{$earliestposter_username_url}"><img src="{$useravatar[\'image\']}" alt="" {$useravatar[\'width_height\']} /></a>',
+			'version_at_last_mod' => 10206,
+		),
+		'activethreads_latestposter_avatar'   => array(
+			'template_data'       => '<a href="{$latestposter_username_url}"><img src="{$useravatar[\'image\']}" alt="" {$useravatar[\'width_height\']} /></a>',
+			'version_at_last_mod' => 10206,
+		),
+		'activethreads_threadauthor_username_link'   => array(
+			'template_data'       => '<a href="{$threadauthor_username_url}">{$threadauthor_username}</a>',
+			'version_at_last_mod' => 10206,
+		),
+		'activethreads_earliestposter_username_link' => array(
+			'template_data'       => '<a href="{$earliestposter_username_url}">{$earliestposter_username}</a>',
+			'version_at_last_mod' => 10206,
+		),
+		'activethreads_latestposter_username_link'   => array(
+			'template_data'       => '<a href="{$latestposter_username_url}">{$latestposter_username}</a>',
+			'version_at_last_mod' => 10206,
+		),
+		'activethreads_thread_link'                  => array(
+			'template_data'       => '<a href="{$thread_url}">{$thread_subject}</a>',
+			'version_at_last_mod' => 10206,
+		),
+		'activethreads_earliestpost_date_link'       => array(
+			'template_data'       => '<a href="{$earliestpost_date_url}">{$earliestpost_date}</a>',
+			'version_at_last_mod' => 10206,
+		),
+		'activethreads_latestpost_date_link'         => array(
+			'template_data'       => '<a href="{$latestpost_date_url}">{$latestpost_date}</a>',
+			'version_at_last_mod' => 10206,
+		),
+		'activethreads_forum_separator'              => array(
+			'template_data'       => '&raquo;',
+			'version_at_last_mod' => 10206,
+		),
+		'activethreads_forum_link'                   => array(
+			'template_data'       => '<a href="{$forum_url}">{$forum_name}</a>',
+			'version_at_last_mod' => 10206,
+		),
+		'activethreads_forum_separator_last'         => array(
+			'template_data'       => '<br /><img src="images/nav_bit.png" alt="" />',
+			'version_at_last_mod' => 10206,
+		),
 	);
 
-	foreach ($templates as $template_title => $template_data) {
-		// First, set the to zero the version of modified templates for this plugin.
-		// (i.e., those with an sid of other than -2). This ensures that Find Updated Templates
-		// detects them.
-		$db->update_query('templates', array('version' => 0), "title='{$template_title}' and sid <> -2");
+	foreach ($templates as $template_title => $arr) {
+		$template_data      = $arr['template_data'      ];
+		$template_vers_code = $arr['version_at_last_mod'];
+
+		// First, if the plugin is already installed and this template has changed
+		// since the user last upgraded this plugin, then set the to zero the version
+		// of modified template for this plugin (i.e., those with an sid of other than -2).
+		// This ensures that Find Updated Templates detects them.
+		if (!empty($old_version_code) && $old_version_code < $template_vers_code) {
+			$db->update_query('templates', array('version' => 0), "title='{$template_title}' and sid <> -2");
+		}
 
 		// Now insert/update master templates with SID -2.
 		$template_row = array(
@@ -465,7 +530,7 @@ table, td, th {
 }
 
 function activethreads_activate() {
-	global $cache, $db;
+	global $cache, $db, $lang, $act_plugin_upgrade_message;
 
 	$lrs_plugins = $cache->read('lrs_plugins');
 	$info = activethreads_info();
@@ -475,7 +540,9 @@ function activethreads_activate() {
 
 	// Perform necessary upgrades.
 	if ($new_version_code > $old_version_code) {
-		act_upgrade();
+		act_upgrade($old_version_code);
+		$act_plugin_upgrade_message = $lang->sprintf($lang->act_successful_upgrade_msg, $lang->act_name, $info['version']);
+		update_admin_session('act_plugin_info_upgrade_message', $lang->sprintf($lang->act_successful_upgrade_msg_for_info, $info['version']));
 	}
 
 	// Update the version in the permanent cache.
@@ -563,7 +630,15 @@ function activethreads_deactivate() {
 	}
 }
 
-function act_limits_usergroup_permission() {
+function act_hookin__plugins_activate_commit() {
+	global $message, $act_plugin_info_upgrade_message;
+
+	if (!empty($act_plugin_info_upgrade_message)) {
+		$message = $act_plugin_info_upgrade_message;
+	}
+}
+
+function act_hookin__limits_usergroup_permission() {
 	global $mybb, $lang, $form, $form_container, $groupscache;
 	$lang->load('activethreads');
 
@@ -582,7 +657,7 @@ function act_limits_usergroup_permission() {
 
 }
 
-function act_limits_usergroup_permission_commit() {
+function act_hookin__limits_usergroup_permission_commit() {
 	global $db, $mybb, $updated_group;
 	$updated_group['act_max_interval_in_mins'] = $db->escape_string((int)$mybb->input['act_max_interval_in_mins']);
 }

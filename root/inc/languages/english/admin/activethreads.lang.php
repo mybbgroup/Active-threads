@@ -42,3 +42,5 @@ $l['act_format_latestposter_username_title'  ] = 'Format usernames of latest pos
 $l['act_format_latestposter_username_desc'   ] = 'If yes, the username of each author of a latest post in the listing will be formatted according to the "username style" of its user group.';
 $l['act_max_displayed_subject_chars_title'   ] = 'Maximum displayed subject characters';
 $l['act_max_displayed_subject_chars_desc'    ] = 'Limits the displayed length of thread subjects in the listing to this number of characters. Set to zero for no limit (other than that imposed by MyBB core code).';
+$l['act_successful_upgrade_msg_for_info'     ] = 'Successfully upgraded to version {1}.';
+$l['act_successful_upgrade_msg'              ] = 'The {1} has been activated successfully and upgraded to version {2}.';
