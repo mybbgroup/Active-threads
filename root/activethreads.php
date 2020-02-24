@@ -294,10 +294,10 @@ if ($active_plugins && $active_plugins['activethreads']) {
             count(p.pid) AS num_posts,
             MIN(p.pid) AS min_pid,
             MAX(p.pid) AS max_pid
- FROM       mybb_threads t
- INNER JOIN mybb_posts p  ON t.tid = p.tid
- INNER JOIN mybb_forums f ON f.fid = t.fid
- INNER JOIN mybb_users uthr ON uthr.uid = t.uid
+ FROM       ".TABLE_PREFIX."threads t
+ INNER JOIN ".TABLE_PREFIX."posts p  ON t.tid = p.tid
+ INNER JOIN ".TABLE_PREFIX."forums f ON f.fid = t.fid
+ INNER JOIN ".TABLE_PREFIX."users uthr ON uthr.uid = t.uid
  WHERE      $conds
  GROUP BY   p.tid";
 	$res = $db->query("SELECT count(*) AS cnt FROM ($inner_sql) AS mainq");
@@ -338,10 +338,10 @@ SELECT mainq.tid,
        umax.usergroup AS max_usergroup
 FROM
 ($inner_sql) AS mainq
-INNER JOIN mybb_posts pmax ON mainq.max_pid = pmax.pid
-INNER JOIN mybb_users umax ON umax.uid      = pmax.uid
-INNER JOIN mybb_posts pmin ON mainq.min_pid = pmin.pid
-INNER JOIN mybb_users umin ON umin.uid      = pmin.uid
+INNER JOIN ".TABLE_PREFIX."posts pmax ON mainq.max_pid = pmax.pid
+INNER JOIN ".TABLE_PREFIX."users umax ON umax.uid      = pmax.uid
+INNER JOIN ".TABLE_PREFIX."posts pmin ON mainq.min_pid = pmin.pid
+INNER JOIN ".TABLE_PREFIX."users umin ON umin.uid      = pmin.uid
 ORDER BY   $order_by
 LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 
