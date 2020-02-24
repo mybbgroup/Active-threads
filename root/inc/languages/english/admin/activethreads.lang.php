@@ -43,4 +43,4 @@ $l['act_format_latestposter_username_desc'   ] = 'If yes, the username of each a
 $l['act_max_displayed_subject_chars_title'   ] = 'Maximum displayed subject characters';
 $l['act_max_displayed_subject_chars_desc'    ] = 'Limits the displayed length of thread subjects in the listing to this number of characters. Set to zero for no limit (other than that imposed by MyBB core code).';
 $l['act_successful_upgrade_msg_for_info'     ] = 'Successfully upgraded to version {1}.';
-$l['act_successful_upgrade_msg'              ] = 'The {1} has been activated successfully and upgraded to version {2}.';
+$l['act_successful_upgrade_msg'              ] = 'The {1} plugin has been activated successfully and upgraded to version {2}.';
