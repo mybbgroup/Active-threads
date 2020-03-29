@@ -270,7 +270,7 @@ if ($active_plugins && $active_plugins['activethreads']) {
 		}
 	}
 	if ($onlyusfids) {
-		$conds .= '('.$conds.' AND ((t.fid IN('.implode(',', $onlyusfids).') AND t.uid="'.$mybb->user['uid'].'") OR t.fid NOT IN('.implode(',', $onlyusfids).')))';
+		$conds = '('.$conds.' AND ((t.fid IN('.implode(',', $onlyusfids).') AND t.uid="'.$mybb->user['uid'].'") OR t.fid NOT IN('.implode(',', $onlyusfids).')))';
 	}
 	$conds = '('.$conds.') AND p.visible > 0';
 
