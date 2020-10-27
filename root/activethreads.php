@@ -279,7 +279,7 @@ if ($active_plugins && $active_plugins['activethreads']) {
             t.subject AS thread_subject,
             t.dateline AS thread_dateline,
             uthr.uid AS thread_uid,
-            uthr.username AS thread_username,
+            t.username AS thread_username,
             uthr.usergroup AS thread_usergroup,
             t.closed AS thread_closed,
             t.lastpost AS thread_lastpost,
@@ -297,7 +297,7 @@ if ($active_plugins && $active_plugins['activethreads']) {
  FROM       ".TABLE_PREFIX."threads t
  INNER JOIN ".TABLE_PREFIX."posts p  ON t.tid = p.tid
  INNER JOIN ".TABLE_PREFIX."forums f ON f.fid = t.fid
- INNER JOIN ".TABLE_PREFIX."users uthr ON uthr.uid = t.uid
+ LEFT OUTER JOIN ".TABLE_PREFIX."users uthr ON uthr.uid = t.uid
  WHERE      $conds
  GROUP BY   p.tid";
 	$res = $db->query("SELECT count(*) AS cnt FROM ($inner_sql) AS mainq");
@@ -328,20 +328,20 @@ SELECT mainq.tid,
        pmin.uid AS min_uid,
        pmin.subject AS min_subject,
        pmin.dateline AS min_dateline,
-       umin.username AS min_username,
+       pmin.username AS min_username,
        umin.usergroup AS min_usergroup,
        mainq.max_pid,
        pmax.uid AS max_uid,
        pmax.subject AS max_subject,
        pmax.dateline AS max_dateline,
-       umax.username AS max_username,
+       pmax.username AS max_username,
        umax.usergroup AS max_usergroup
 FROM
 ($inner_sql) AS mainq
 INNER JOIN ".TABLE_PREFIX."posts pmax ON mainq.max_pid = pmax.pid
-INNER JOIN ".TABLE_PREFIX."users umax ON umax.uid      = pmax.uid
+LEFT OUTER JOIN ".TABLE_PREFIX."users umax ON umax.uid      = pmax.uid
 INNER JOIN ".TABLE_PREFIX."posts pmin ON mainq.min_pid = pmin.pid
-INNER JOIN ".TABLE_PREFIX."users umin ON umin.uid      = pmin.uid
+LEFT OUTER JOIN ".TABLE_PREFIX."users umin ON umin.uid      = pmin.uid
 ORDER BY   $order_by
 LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 
@@ -464,8 +464,10 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 			$threadauthor_username = $mybb->settings[C_ACT.'_format_threadauthor_username']
 			                     ? format_name($row['thread_username'], $row['thread_usergroup'])
 			                     : htmlspecialchars_uni($row['thread_username']);
-			$threadauthor_username_url = get_profile_link($row['thread_uid']);
-			eval('$threadauthor_link = "'.$templates->get('activethreads_threadauthor_username_link').'";');
+			if ($row['thread_uid']) {
+				$threadauthor_username_url = get_profile_link($row['thread_uid']);
+				eval('$threadauthor_link = "'.$templates->get('activethreads_threadauthor_username_link').'";');
+			} else	$threadauthor_link = $threadauthor_username;
 			$thread_date = my_date('normal', $row['thread_dateline']);
 			$num_posts_fmt = my_number_format($row['num_posts']);
 
@@ -489,16 +491,20 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 			$earliestposter_username = $mybb->settings[C_ACT.'_format_earliestposter_username']
 			                     ? format_name($row['min_username'], $row['min_usergroup'])
 			                     : htmlspecialchars_uni($row['min_username']);
-			$earliestposter_username_url = get_profile_link($row['min_uid']);
-			eval('$earliestposter_username_link = "'.$templates->get('activethreads_earliestposter_username_link').'";');
+			if ($row['min_uid']) {
+				$earliestposter_username_url = get_profile_link($row['min_uid']);
+				eval('$earliestposter_username_link = "'.$templates->get('activethreads_earliestposter_username_link').'";');
+			} else	$earliestposter_username_link = $earliestposter_username;
 			$latestpost_url = get_post_link($row['max_pid']).'#pid'.$row['max_pid'];
 			$latestpost_date = my_date('normal', $row['max_dateline']);
 			eval('$latestpost_date_link = "'.$templates->get('activethreads_latestpost_date_link').'";');
 			$latestposter_username = $mybb->settings[C_ACT.'_format_latestposter_username']
 			                     ? format_name($row['max_username'], $row['max_usergroup'])
 			                     : htmlspecialchars_uni($row['max_username']);
-			$latestposter_username_url = get_profile_link($row['max_uid']);
-			eval('$latestposter_username_link = "'.$templates->get('activethreads_latestposter_username_link').'";');
+			if ($row['max_uid']) {
+				$latestposter_username_url = get_profile_link($row['max_uid']);
+				eval('$latestposter_username_link = "'.$templates->get('activethreads_latestposter_username_link').'";');
+			} else	$latestposter_username_link = $latestposter_username;
 
 			// The below logic for determining the folder image, icon and whether to show an "unread" arrow
 			// has been adapted from code in inc/forumdisplay.php.
