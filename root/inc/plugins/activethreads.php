@@ -49,10 +49,10 @@ function activethreads_info() {
 		'website'       => 'https://github.com/lairdshaw/MyBB-active-threads-plugin',
 		'author'        => 'Laird Shaw',
 		'authorsite'    => 'https://github.com/lairdshaw',
-		'version'       => '1.2.12',
+		'version'       => '1.2.13',
 		// Constructed by converting each component of 'version' above into two digits (zero-padded if necessary),
 		// then concatenating them, then removing any leading zero(es) to avoid the value being interpreted as octal.
-		'version_code'  => '10212',
+		'version_code'  => '10213',
 		'guid'          => '',
 		'codename'      => C_ACT,
 		'compatibility' => '18*'
