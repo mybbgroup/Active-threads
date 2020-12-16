@@ -91,8 +91,8 @@ function activethreads_install() {
 	// Insert the plugin's settings into the database.
 	$setting_group = array(
 		'name'         => C_ACT.'_settings',
-		'title'        => $db->escape_string($lang->act_name),
-		'description'  => $db->escape_string($lang->act_desc),
+		'title'        => $db->escape_string($lang->act_settings),
+		'description'  => $db->escape_string($lang->act_settings_desc),
 		'disporder'    => intval($disporder),
 		'isdefault'    => 0
 	);
