@@ -485,7 +485,7 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 			$forum_name = htmlspecialchars_uni($forum_names[$fid_last]);
 			eval('$forum_links .= "'.$templates->get('activethreads_forum_link').'";');
 
-			$earliestpost_url = get_post_link($row['min_pid']).'#pid'.$row['min_pid'];
+			$earliestpost_date_url = get_post_link($row['min_pid']).'#pid'.$row['min_pid'];
 			$earliestpost_date = my_date('normal', $row['min_dateline']);
 			eval('$earliestpost_date_link = "'.$templates->get('activethreads_earliestpost_date_link').'";');
 			$earliestposter_username = $mybb->settings[C_ACT.'_format_earliestposter_username']
@@ -495,7 +495,7 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 				$earliestposter_username_url = get_profile_link($row['min_uid']);
 				eval('$earliestposter_username_link = "'.$templates->get('activethreads_earliestposter_username_link').'";');
 			} else	$earliestposter_username_link = $earliestposter_username;
-			$latestpost_url = get_post_link($row['max_pid']).'#pid'.$row['max_pid'];
+			$latestpost_date_url = get_post_link($row['max_pid']).'#pid'.$row['max_pid'];
 			$latestpost_date = my_date('normal', $row['max_dateline']);
 			eval('$latestpost_date_link = "'.$templates->get('activethreads_latestpost_date_link').'";');
 			$latestposter_username = $mybb->settings[C_ACT.'_format_latestposter_username']
