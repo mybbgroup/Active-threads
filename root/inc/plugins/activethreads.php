@@ -46,9 +46,9 @@ function activethreads_info() {
 	$ret = array(
 		'name'          => $lang->act_name,
 		'description'   => $lang->act_desc,
-		'website'       => 'https://github.com/lairdshaw/MyBB-active-threads-plugin',
-		'author'        => 'Laird Shaw',
-		'authorsite'    => 'https://github.com/lairdshaw',
+		'website'       => 'https://mybb.group/Thread-Active-Threads',
+		'author'        => 'Laird as a member of the unofficial MyBB Group',
+		'authorsite'    => 'https://mybb.group/User-Laird',
 		'version'       => '1.2.13',
 		// Constructed by converting each component of 'version' above into two digits (zero-padded if necessary),
 		// then concatenating them, then removing any leading zero(es) to avoid the value being interpreted as octal.
