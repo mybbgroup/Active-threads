@@ -91,6 +91,11 @@ if ($active_plugins && $active_plugins['activethreads']) {
 		// Check if this forum is password protected and we have a valid password
 		check_forum_password($forum['fid']);
 
+		$excl_fids = $mybb->settings['activethreads_excluded_forums'];
+		if ($excl_fids) {
+			$excl_fids_cond = $excl_fids == -1 ? ' AND fid = -1' : " AND fid NOT IN ({$excl_fids})";
+		} else	$excl_fids_cond = '';
+
 		if ($mybb->get_input('sort') != 'username') {
 			$sortsql = ' ORDER BY posts DESC';
 		} else	$sortsql = ' ORDER BY p.username ASC';
@@ -99,7 +104,7 @@ if ($active_plugins && $active_plugins['activethreads']) {
 			SELECT COUNT(p.pid) AS posts, p.username AS postusername, u.uid, u.username, u.usergroup, u.displaygroup
 			FROM ".TABLE_PREFIX."posts p
 			LEFT JOIN ".TABLE_PREFIX."users u ON (u.uid=p.uid)
-			WHERE tid='".$tid."' AND $show_posts AND p.dateline >= '$min_dateline' AND p.dateline <= '$max_dateline'
+			WHERE tid='".$tid."'$excl_fids_cond AND $show_posts AND p.dateline >= '$min_dateline' AND p.dateline <= '$max_dateline'
 			GROUP BY u.uid, p.username, u.uid, u.username, u.usergroup, u.displaygroup
 			".$sortsql);
 		while ($poster = $db->fetch_array($query)) {
@@ -243,7 +248,12 @@ if ($active_plugins && $active_plugins['activethreads']) {
 	}
 	$date_prior = my_date('normal', $ts_epoch - $secs_before);
 
-	$conds = 'p.dateline >= '.($ts_epoch - $secs_before).' AND p.dateline <= '.$ts_epoch;
+	$excl_fids = $mybb->settings['activethreads_excluded_forums'];
+	if ($excl_fids) {
+		$excl_fids_cond = $excl_fids == -1 ? ' AND t.fid = -1' : " AND t.fid NOT IN ({$excl_fids})";
+	} else	$excl_fids_cond = '';
+
+	$conds = 'p.dateline >= '.($ts_epoch - $secs_before).' AND p.dateline <= '.$ts_epoch.$excl_fids_cond;
 
 	// Make sure the user only sees threads and (counts of) posts s/he is allowed to see.
 	$fids = get_unviewable_forums(true);

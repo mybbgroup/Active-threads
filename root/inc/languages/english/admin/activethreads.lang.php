@@ -13,6 +13,8 @@ $l['act_display_earliestpost_avatar_desc' ] = 'If yes, the avatar of the author 
 $l['act_display_latestpost_avatar_title'] = 'Display latest posters\' user avatars?';
 $l['act_display_latestpost_avatar_desc' ] = 'If yes, the avatar of the author of each thread\'s latest post will be shown in the listing';
 $l['act_per_usergroup_permissions_heading'] = 'Active Threads Limits';
+$l['act_excluded_forums_title'            ] = 'Excluded Forums';
+$l['act_excluded_forums_desc'             ] = 'Select forums whose threads to exclude from the active listing';
 $l['act_per_usergroup_title'              ] = 'Enable per-usergroup interval setting overrides';
 $l['act_per_usergroup_desc'               ] = 'When enabled, the "Maximum allowed interval (minutes)" setting is taken from the user\'s usergroup rather than from the global setting above. This setting can be customised for each usergroup in the ACP under Users & Groups -> <a href="index.php?module=user-groups">Groups</a> -> [Selected group] -> Users and Permissions [tab] -> Active Threads Limits [heading].';
 $l['act_default_days_title'               ] = 'Default days';

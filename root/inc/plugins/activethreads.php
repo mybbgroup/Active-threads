@@ -63,10 +63,10 @@ function activethreads_info() {
 		'website'       => 'https://mybb.group/Thread-Active-Threads',
 		'author'        => 'Laird as a member of the unofficial MyBB Group',
 		'authorsite'    => 'https://mybb.group/User-Laird',
-		'version'       => '1.2.13',
+		'version'       => '1.3.0',
 		// Constructed by converting each component of 'version' above into two digits (zero-padded if necessary),
 		// then concatenating them, then removing any leading zero(es) to avoid the value being interpreted as octal.
-		'version_code'  => '10213',
+		'version_code'  => '10300',
 		'guid'          => '',
 		'codename'      => C_ACT,
 		'compatibility' => '18*'
@@ -205,6 +205,12 @@ function act_update_create_settings($existing_setting_values = array()) {
 			'description' => $lang->act_per_usergroup_desc,
 			'optionscode' => 'yesno',
 			'value'       => '1',
+		),
+		'excluded_forums' => array(
+			'title'       => $lang->act_excluded_forums_title,
+			'description' => $lang->act_excluded_forums_desc ,
+			'optionscode' => 'forumselect'                   ,
+			'value'       => ''                              ,
 		),
 		'default_days' => array(
 			'title'       => $lang->act_default_days_title,
