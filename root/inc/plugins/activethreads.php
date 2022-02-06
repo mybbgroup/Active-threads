@@ -643,6 +643,9 @@ function act_hookin__limits_usergroup_permission() {
 	$lang->load('activethreads');
 
 	$gid = $mybb->get_input('gid', MyBB::INPUT_INT);
+	if (!is_array($groupscache)) {
+		$groupscache = $mybb->cache->read('usergroups');
+	}
 	$usergroup = $groupscache[$gid];
 
 	if ($mybb->settings[C_ACT.'_per_usergroup'] == 1) {
