@@ -16,10 +16,10 @@
  */
 
 define('IN_MYBB', 1);
-require_once './global.php';
-
 define('THIS_SCRIPT', 'activethreads.php');
 define('ACT_ITEMS_PER_PAGE', 20);
+
+require_once './global.php';
 
 if (!isset($lang->activethreads)) {
 	$lang->load('activethreads');

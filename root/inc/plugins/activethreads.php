@@ -26,14 +26,28 @@ if (defined('IN_ADMINCP')) {
 	$plugins->add_hook('admin_formcontainer_end'             , 'act_hookin__limits_usergroup_permission'       );
 	$plugins->add_hook('admin_user_groups_edit_commit'       , 'act_hookin__limits_usergroup_permission_commit');
 	$plugins->add_hook('admin_config_plugins_activate_commit', 'act_hookin__plugins_activate_commit'           );
-} else	$plugins->add_hook('global_start'                        , 'activethreads_hookin__global_start'            );
+} else	$plugins->add_hook('global_start'                        , 'act_hookin__global_start'                      );
 
-function activethreads_hookin__global_start() {
-	global $lang;
+function act_hookin__global_start() {
+	global $lang, $plugins_cache, $cache, $templatelist;
 
-	// Load the language file so that the 'act_view_act_thr' message is available for the 'header_welcomeblock_guest' template
-	// on every page.
-	$lang->load(C_ACT);
+	if (empty($plugins_cache) || !is_array($plugins_cache)) {
+		$plugins_cache = $cache->read('plugins');
+	}
+	$active_plugins = $plugins_cache['active'];
+	if ($active_plugins && $active_plugins['activethreads']) {
+		// Load the language file so that the 'act_view_act_thr' message is available for the 'header_welcomeblock_guest' template
+		// on every page.
+		$lang->load(C_ACT);
+
+		// Have necessary templates pulled out of the DB in a single query.
+		if (THIS_SCRIPT == 'activethreads.php') {
+			if (!empty($templatelist)) {
+				$templatelist .= ',';
+			}
+			$templatelist .= 'activethreads_thread_link, activethreads_threadauthor_username_link, activethreads_forum_link, activethreads_forum_separator_last, activethreads_earliestpost_date_link, activethreads_earliestposter_username_link, activethreads_latestpost_date_link, activethreads_latestposter_username_link, forumdisplay_thread_gotounread, activethreads_result_row, activethreads_results, multipage_page_current, multipage_page, multipage_nextpage, multipage, activethreads_page';
+		}
+	}
 }
 
 function activethreads_info() {
