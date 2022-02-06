@@ -68,15 +68,7 @@ if ($active_plugins && $active_plugins['activethreads']) {
 			error($lang->error_invalidthread);
 		}
 
-		if (is_moderator($thread['fid'], 'canviewdeleted') || is_moderator($thread['fid'], 'canviewunapprove')) {
-			if (is_moderator($thread['fid'], 'canviewunapprove') && !is_moderator($thread['fid'], 'canviewdeleted')) {
-				$show_posts = 'p.visible IN (0,1)';
-			} else if(is_moderator($thread['fid'], 'canviewdeleted') && !is_moderator($thread['fid'], 'canviewunapprove')) {
-				$show_posts = 'p.visible IN (-1,1)';
-			} else {
-				$show_posts = 'p.visible IN (-1,0,1)';
-			}
-		} else	$show_posts = 'p.visible = 1';
+		$show_posts = 'p.visible > 0';
 
 		// Does the thread belong to a valid forum?
 		$forum = get_forum($thread['fid']);
