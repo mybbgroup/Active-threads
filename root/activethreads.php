@@ -674,7 +674,7 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 	$act_before_date_tooltip = htmlspecialchars_uni($lang->act_before_date_tooltip);
 	$act_set_period_of_interest_tooltip = htmlspecialchars_uni($lang->act_set_period_of_interest_tooltip);
 	$act_set_period_of_interest = htmlspecialchars_uni($lang->act_set_period_of_interest);
-	$multipage = multipage($tot_rows, ACT_ITEMS_PER_PAGE, $page, act_make_url($days, $hours, $mins, $date, $sort, $order, '{page}'));
+	$multipage = multipage($tot_rows, ACT_ITEMS_PER_PAGE, $page, act_make_url($days, $hours, $mins, $date, $sort, $order, '{page}', false));
 	add_breadcrumb($lang->act_act_recent_threads_breadcrumb, C_ACT.'.php');
 	$post_code_string = "&amp;my_post_key={$mybb->post_code}";
 	eval('$html = "'.$templates->get('activethreads_page', 1, 0).'";');
