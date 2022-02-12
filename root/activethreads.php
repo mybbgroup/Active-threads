@@ -179,6 +179,7 @@ if ($active_plugins && $active_plugins['activethreads']) {
 	$hours = $mybb->get_input('hours', MyBB::INPUT_INT);
 	$mins = $mybb->get_input('mins', MyBB::INPUT_INT);
 	$date = $mybb->get_input('date');
+	$date_safe = htmlspecialchars_uni($date);
 	$page = $mybb->get_input('page', MyBB::INPUT_INT);
 	$sort = $mybb->get_input('sort');
 	if (!$sort) {
@@ -239,7 +240,7 @@ if ($active_plugins && $active_plugins['activethreads']) {
 		$tz_org = date_default_timezone_get();
 		date_default_timezone_set('GMT');
 		$ts_epoch = strtotime($date, TIME_NOW + $timezone*60*60) - $timezone*60*60;
-		$date_for_title = $date;
+		$date_for_title = $date_safe;
 		date_default_timezone_set($tz_org);
 	} else {
 		$ts_epoch = TIME_NOW;

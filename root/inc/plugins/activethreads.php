@@ -63,7 +63,7 @@ function activethreads_info() {
 		'website'       => 'https://mybb.group/Thread-Active-Threads',
 		'author'        => 'Laird as a member of the unofficial MyBB Group',
 		'authorsite'    => 'https://mybb.group/User-Laird',
-		'version'       => '1.3.1-dev-xss-fix-pre-release',
+		'version'       => '1.3.1',
 		// Constructed by converting each component of 'version' above into two digits (zero-padded if necessary),
 		// then concatenating them, then removing any leading zero(es) to avoid the value being interpreted as octal.
 		'version_code'  => '10301',
@@ -354,7 +354,7 @@ table, td, th {
 		<td><input type="text" name="days" value="{$days}" size="5" style="text-align: right;"/></td>
 		<td><input type="text" name="hours" value="{$hours}" size="5" style="text-align: right;" /></td>
 		<td><input type="text" name="mins" value="{$mins}" size="5" style="text-align: right;" /></td>
-		<td><input type="text" name="date" value="{$date}" size="16" style="text-align: right;" title="{$act_before_date_tooltip}" /></td>
+		<td><input type="text" name="date" value="{$date_safe}" size="16" style="text-align: right;" title="{$act_before_date_tooltip}" /></td>
 		<td>
 			<input type="radio" name="order" value="ascending" id="sort.asc"{$asc_checked} /><label for ="sort.asc">{$lang->act_asc}</label><br />
 			<input type="radio" name="order" value="descending" id="sort.desc"{$desc_checked} /><label for ="sort.desc">{$lang->act_desc}</label>
@@ -379,7 +379,7 @@ table, td, th {
 {$footer}
 </body>
 </html>',
-			'version_at_last_mod' => 10206,
+			'version_at_last_mod' => 10301,
 		),
 		'activethreads_result_row' => array(
 			'template_data'       => '
