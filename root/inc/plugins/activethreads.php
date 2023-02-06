@@ -35,7 +35,7 @@ function act_hookin__global_start() {
 		$plugins_cache = $cache->read('plugins');
 	}
 	$active_plugins = $plugins_cache['active'];
-	if ($active_plugins && $active_plugins['activethreads']) {
+	if ($active_plugins && !empty($active_plugins['activethreads'])) {
 		// Load the language file so that the 'act_view_act_thr' message is available for the 'header_welcomeblock_guest' template
 		// on every page.
 		$lang->load(C_ACT);
