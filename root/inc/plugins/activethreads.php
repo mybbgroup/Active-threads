@@ -663,21 +663,18 @@ function act_hookin__limits_usergroup_permission() {
 	$lang->load('activethreads');
 
 	$gid = $mybb->get_input('gid', MyBB::INPUT_INT);
-	if (!is_array($groupscache)) {
-		$groupscache = $mybb->cache->read('usergroups');
-	}
-	$usergroup = $groupscache[$gid];
-
-	if ($mybb->settings[C_ACT.'_per_usergroup'] == 1) {
-		if (!empty($form_container->_title) && !empty($lang->users_permissions) && $form_container->_title == $lang->users_permissions) {
-			$act_per_usergroup_options = array(
-				"{$lang->act_max_interval_in_mins_title}<br /><small class=\"input\">{$lang->act_max_interval_in_mins_desc}</small><br />".$form->generate_numeric_field('act_max_interval_in_mins', $usergroup['act_max_interval_in_mins'], array('id' => 'id_act_max_interval_in_mins', 'class' => 'field50', 'min' => 0)),
-			);
-
-			$form_container->output_row($lang->act_per_usergroup_permissions_heading, "", "<div class=\"group_settings_bit\">".implode("</div><div class=\"group_settings_bit\">", $act_per_usergroup_options)."</div>");
+	if ($mybb->settings[C_ACT.'_per_usergroup'] == 1 && !empty($form_container->_title) && !empty($lang->users_permissions) && $form_container->_title == $lang->users_permissions && $gid > 0) {
+		if (!is_array($groupscache)) {
+			$groupscache = $mybb->cache->read('usergroups');
 		}
-	}
+		$usergroup = $groupscache[$gid];
 
+		$act_per_usergroup_options = array(
+			"{$lang->act_max_interval_in_mins_title}<br /><small class=\"input\">{$lang->act_max_interval_in_mins_desc}</small><br />".$form->generate_numeric_field('act_max_interval_in_mins', $usergroup['act_max_interval_in_mins'], array('id' => 'id_act_max_interval_in_mins', 'class' => 'field50', 'min' => 0)),
+		);
+
+		$form_container->output_row($lang->act_per_usergroup_permissions_heading, "", "<div class=\"group_settings_bit\">".implode("</div><div class=\"group_settings_bit\">", $act_per_usergroup_options)."</div>");
+	}
 }
 
 function act_hookin__limits_usergroup_permission_commit() {
