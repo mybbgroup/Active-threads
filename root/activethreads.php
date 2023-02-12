@@ -39,7 +39,7 @@ if (!is_array($plugins_cache)) {
 }
 $active_plugins = $plugins_cache['active'];
 
-if ($active_plugins && $active_plugins['activethreads']) {
+if ($active_plugins && !empty($active_plugins['activethreads'])) {
 	// The below conditional and the code included in its remit has been adapted and largely copied wholesale from misc.php.
 	// The main addition is that it requires a date range to be stipulated for the posts to be considered from the thread.
 	if ($mybb->input['action'] == 'whoposted') {
@@ -123,12 +123,12 @@ if ($active_plugins && $active_plugins['activethreads']) {
 			} else {
 				$profile_link = build_profile_link($poster_name, $poster['uid']);
 			}
+			$poster['posts'] = my_number_format($poster['posts']);
 			$numposts += $poster['posts'];
 			eval('$whoposted .= "'.$templates->get('misc_whoposted_poster').'";');
 			$altbg = alt_trow();
 		}
 		$numposts = my_number_format($numposts);
-		$poster['posts'] = my_number_format($poster['posts']);
 		if ($modal) {
 			eval('$whop = "'.$templates->get('activethreads_whoposted', 1, 0).'";');
 			echo $whop;
@@ -364,8 +364,8 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 		// The logic below has been taken from inc/forumdisplay.php
 
 		// If this is a moved thread, then set the tid for participation marking and thread read marking to that of the moved thread
-		if (substr($row['closed'], 0, 5) == 'moved') {
-			$tid = substr($row['closed'], 6);
+		if (substr($row['thread_closed'], 0, 5) == 'moved') {
+			$tid = substr($row['thread_closed'], 6);
 			if (!isset($tids[$tid])) {
 				$moved_threads[$tid] = $row['tid'];
 				$tids[$row['tid']] = $tid;
@@ -456,7 +456,7 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 			$bgcolor = 'trow'.($i+1);
 			$fid = $row['fid'];
 			$tid = $row['tid'];
-			$moved = explode('|', $row['closed']);
+			$moved = explode('|', $row['thread_closed']);
 			$thread_url = get_thread_link($tid);
 			$max_subj_chars = $mybb->settings[C_ACT.'_max_displayed_subject_chars'];
 			if ($max_subj_chars > 0) {
@@ -548,7 +548,7 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 				$folder .= 'hot';
 				$folder_label .= $lang->icon_hot;
 			}
-			if ($row['closed'] == 1) {
+			if ($row['thread_closed'] == 1) {
 				$folder .= 'close';
 				$folder_label .= $lang->icon_close;
 			}
@@ -675,7 +675,7 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 	$act_before_date_tooltip = htmlspecialchars_uni($lang->act_before_date_tooltip);
 	$act_set_period_of_interest_tooltip = htmlspecialchars_uni($lang->act_set_period_of_interest_tooltip);
 	$act_set_period_of_interest = htmlspecialchars_uni($lang->act_set_period_of_interest);
-	$multipage = multipage($tot_rows, ACT_ITEMS_PER_PAGE, $page, act_make_url($days, $hours, $mins, $date, $sort, $order, '{page}', false));
+	$multipage = multipage($tot_rows, ACT_ITEMS_PER_PAGE, $page, act_make_url($days, $hours, $mins, $date, $sort, $order, '{page}'));
 	add_breadcrumb($lang->act_act_recent_threads_breadcrumb, C_ACT.'.php');
 	$post_code_string = "&amp;my_post_key={$mybb->post_code}";
 	eval('$html = "'.$templates->get('activethreads_page', 1, 0).'";');
