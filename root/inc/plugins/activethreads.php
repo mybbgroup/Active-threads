@@ -555,7 +555,7 @@ function activethreads_activate() {
 	$lrs_plugins = $cache->read('lrs_plugins');
 	$info = activethreads_info();
 
-	$old_version_code = $lrs_plugins[C_ACT]['version_code'];
+	$old_version_code = !empty($lrs_plugins[C_ACT]['version_code']) ? $lrs_plugins[C_ACT]['version_code'] : false;
 	$new_version_code = $info['version_code'];
 
 	// Perform necessary upgrades.
@@ -566,6 +566,9 @@ function activethreads_activate() {
 	}
 
 	// Update the version in the permanent cache.
+	if (empty($lrs_plugins)) {
+		$lrs_plugins = [];
+	}
 	$lrs_plugins[C_ACT] = array(
 		'version'      => $info['version'     ],
 		'version_code' => $info['version_code'],
