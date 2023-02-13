@@ -37,7 +37,7 @@ function act_make_url($days, $hours, $mins, $date, $sort, $order, $page, $encode
 if (!is_array($plugins_cache)) {
 	$plugins_cache = $cache->read('plugins');
 }
-$active_plugins = $plugins_cache['active'];
+$active_plugins = !empty($plugins_cache['active']) ? $plugins_cache['active'] : [];
 
 if ($active_plugins && !empty($active_plugins['activethreads'])) {
 	// The below conditional and the code included in its remit has been adapted and largely copied wholesale from misc.php.
