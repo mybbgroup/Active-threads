@@ -72,9 +72,9 @@ function activethreads_info() {
 		'compatibility' => '18*'
 	);
 
-	if (is_array($plugins_cache) && is_array($plugins_cache['active']) && $plugins_cache['active'][C_ACT]) {
+	if (!empty($plugins_cache['active'][C_ACT])) {
 		if (!empty($admin_session['data']['act_plugin_info_upgrade_message'])) {
-			$msg = $admin_session['data']['act_plugin_info_upgrade_message'].' '.$msg;
+			$msg = $admin_session['data']['act_plugin_info_upgrade_message'];
 			update_admin_session('act_plugin_info_upgrade_message', '');
 			$ret['description'] = "<ul><li style=\"list-style-image: url(styles/default/images/icons/success.png)\"><div class=\"success\">$msg</div></li></ul>".PHP_EOL.$ret['description'];
 		}
@@ -533,7 +533,7 @@ table, td, th {
 
 		$res = $db->simple_select('templates', 'tid', "sid='-2' AND title='".$db->escape_string($template_title)."'");
 		$existing = $db->fetch_array($res);
-		if ($existing['tid']) {
+		if (!empty($existing['tid'])) {
 			unset($template_row['sid']);
 			unset($template_row['title']);
 			$db->update_query('templates', $template_row, "title='".$db->escape_string($template_title)."' AND sid='-2'");
