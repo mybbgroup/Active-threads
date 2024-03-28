@@ -95,22 +95,7 @@ EOF;
 }
 
 function activethreads_install() {
-	global $mybb, $db, $lang, $cache;
-
-	$lang->load(C_ACT);
-
-	$res = $db->simple_select('settinggroups', 'MAX(disporder) as max_disporder');
-	$disporder = $db->fetch_field($res, 'max_disporder') + 1;
-
-	// Insert the plugin's settings into the database.
-	$setting_group = array(
-		'name'         => C_ACT.'_settings',
-		'title'        => $db->escape_string($lang->act_settings),
-		'description'  => $db->escape_string($lang->act_settings_desc),
-		'disporder'    => intval($disporder),
-		'isdefault'    => 0
-	);
-	$db->insert_query('settinggroups', $setting_group);
+	global $db;
 
 	act_update_create_settings();
 
@@ -164,22 +149,11 @@ function act_upgrade($old_version_code) {
 	// Update the master templates.
 	act_install_upgrade_common($old_version_code);
 
-	// Save existing values for the plugin's settings.
-	$existing_setting_values = array();
-	$res = $db->simple_select('settinggroups', 'gid', "name = '".C_ACT."_settings'", array('limit' => 1));
-	$group = $db->fetch_array($res);
-	if (!empty($group['gid'])) {
-		$res = $db->simple_select('settings', 'value, name', "gid='{$group['gid']}'");
-		while ($setting = $db->fetch_array($res)) {
-			$existing_setting_values[$setting['name']] = $setting['value'];
-		}
-	}
-
-	act_update_create_settings($existing_setting_values);
+	act_update_create_settings();
 }
 
 
-function act_update_create_settings($existing_setting_values = array()) {
+function act_update_create_settings() {
 	global $db, $lang;
 
 	$lang->load(C_ACT);
@@ -189,8 +163,31 @@ function act_update_create_settings($existing_setting_values = array()) {
 	$row = $db->fetch_array($res);
 	$gid = $row['gid'];
 
-	// Delete existing activethreads settings, without deleting their group
-	$db->delete_query('settings', "gid='{$gid}'");
+	$setting_group = array(
+		'name'         => C_ACT.'_settings',
+		'title'        => $db->escape_string($lang->act_settings),
+		'description'  => $db->escape_string($lang->act_settings_desc),
+		'isdefault'    => 0
+	);
+
+	if (empty($gid)) {
+		// Insert the plugin's settings group into the database.
+		$res = $db->simple_select('settinggroups', 'MAX(disporder) as max_disporder');
+		$disporder = $db->fetch_field($res, 'max_disporder') + 1;
+		$setting_group['disporder'] = intval($disporder);
+		$db->insert_query('settinggroups', $setting_group);
+		$gid = $db->insert_id();
+	} else {
+		// Update the plugin's settings group in the database.
+		$db->update_query('settinggroups', $setting_group, "gid='{$gid}'");
+	}
+
+	// Get the plugin's existing settings, if any.
+	$existing_settings = array();
+	$query = $db->simple_select('settings', 'name', "gid='{$gid}'");
+	while ($setting = $db->fetch_array($query)) {
+		$existing_settings[] = $setting['name'];
+	}
 
 	// The settings to (re)create in the database.
 	$settings = array(
@@ -290,22 +287,42 @@ function act_update_create_settings($existing_setting_values = array()) {
 		$settings['max_interval_in_mins']['value'] = floor($existing_setting_values[C_ACT.'_max_interval_in_secs'] / 60);
 	}
 
-	// (Re)create the settings, retaining the old values where they exist.
-	$x = 1;
+	// Delete existing settings no longer present in the plugin's current version.
+	$new_settings = array_map(function($e) {return C_ACT.'_'.$e;}, array_keys($settings));
+	$to_delete = array_diff($existing_settings, $new_settings);
+	if ($to_delete) {
+		$names_esc_cs_qt = "'".implode("', '", array_map([$db, 'escape_string'], $to_delete))."'";
+		$db->delete_query('settings', "name IN ({$names_esc_cs_qt}) AND gid='{$gid}'");
+	}
+
+	// Insert into, or update in, the database each of this plugin's settings.
+	$disporder = 1;
+	$inserts = [];
 	foreach ($settings as $name => $setting) {
-		$value = isset($existing_setting_values[C_ACT.'_'.$name]) ? $existing_setting_values[C_ACT.'_'.$name] : $setting['value'];
-		$insert_settings = array(
-			'name' => $db->escape_string(C_ACT.'_'.$name),
-			'title' => $db->escape_string($setting['title']),
+		$fields = array(
+			'name'        => $db->escape_string(C_ACT.'_'.$name),
+			'title'       => $db->escape_string($setting['title']),
 			'description' => $db->escape_string($setting['description']),
 			'optionscode' => $db->escape_string($setting['optionscode']),
-			'value' => $value,
-			'disporder' => $x,
-			'gid' => $gid,
-			'isdefault' => 0
+			'value'       => $db->escape_string($setting['value'      ]),
+			'disporder'   => $disporder,
+			'gid'         => $gid,
+			'isdefault'   => 0
 		);
-		$db->insert_query('settings', $insert_settings);
-		$x++;
+		if (in_array(C_ACT.'_'.$name, $existing_settings)) {
+			// Update the already-existing setting while retaining its value.
+			unset($fields['value']);
+			$db->update_query('settings', $fields, "name='".C_ACT.'_'."{$name}' AND gid='{$gid}'");
+		} else {
+			// Queue the new setting for insertion.
+			$inserts[] = $fields;
+		}
+ 		$disporder++;
+	}
+
+	if ($inserts) {
+		// Insert the queued new settings.
+		$db->insert_query_multiple('settings', $inserts);
 	}
 
 	rebuild_settings();
@@ -559,8 +576,8 @@ function activethreads_activate() {
 	$new_version_code = $info['version_code'];
 
 	// Perform necessary upgrades.
+	act_upgrade($old_version_code);
 	if ($new_version_code > $old_version_code) {
-		act_upgrade($old_version_code);
 		$act_plugin_upgrade_message = $lang->sprintf($lang->act_successful_upgrade_msg, $lang->act_name, $info['version']);
 		update_admin_session('act_plugin_info_upgrade_message', $lang->sprintf($lang->act_successful_upgrade_msg_for_info, $info['version']));
 	}
