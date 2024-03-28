@@ -63,10 +63,10 @@ function activethreads_info() {
 		'website'       => 'https://mybb.group/Thread-Active-Threads',
 		'author'        => 'Laird as a member of the unofficial MyBB Group',
 		'authorsite'    => 'https://mybb.group/User-Laird',
-		'version'       => '1.3.1',
+		'version'       => '1.4.0-dev',
 		// Constructed by converting each component of 'version' above into two digits (zero-padded if necessary),
 		// then concatenating them, then removing any leading zero(es) to avoid the value being interpreted as octal.
-		'version_code'  => '10301',
+		'version_code'  => '10400',
 		'guid'          => '',
 		'codename'      => C_ACT,
 		'compatibility' => '18*'
