@@ -42,7 +42,7 @@ $active_plugins = !empty($plugins_cache['active']) ? $plugins_cache['active'] : 
 if ($active_plugins && !empty($active_plugins['activethreads'])) {
 	// The below conditional and the code included in its remit has been adapted and largely copied wholesale from misc.php.
 	// The main addition is that it requires a date range to be stipulated for the posts to be considered from the thread.
-	if ($mybb->input['action'] == 'whoposted') {
+	if ($mybb->get_input('action') == 'whoposted') {
 		$lang->load('misc');
 		$numposts = 0;
 		$altbg = alt_trow();
