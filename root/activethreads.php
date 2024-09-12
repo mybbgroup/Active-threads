@@ -671,6 +671,7 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 
 	} else {
 		$results_html = '<p style="text-align: center">'.$lang->act_no_results.'</p>';
+		$asc_checked = $desc_checked = $num_posts_selected = $min_dateline_selected = $max_dateline_selected = $thread_subject_selected = $thread_username_selected = $thread_dateline_selected = $forum_name_selected = $min_username_selected = $max_username_selected = '';
 	}
 	$act_before_date_tooltip = htmlspecialchars_uni($lang->act_before_date_tooltip);
 	$act_set_period_of_interest_tooltip = htmlspecialchars_uni($lang->act_set_period_of_interest_tooltip);
