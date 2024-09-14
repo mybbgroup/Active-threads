@@ -412,6 +412,9 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 
 	// This logic for determining each forum's read date cutoff has been adapted from inc/forumdisplay.php
 	$forum_reads = array();
+	foreach ($fids as $fid) {
+		$forum_reads[$fid] = 0;
+	}
 	$read_cutoff = TIME_NOW - $mybb->settings['threadreadcut']*60*60*24;
 	if ($fids && $mybb->settings['threadreadcut'] > 0 && $mybb->user['uid']) {
 		$fids_list = implode(',', $fids);
