@@ -361,7 +361,7 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 			}
 		}
 
-		// The logic below has been taken from inc/forumdisplay.php
+		// The logic below has been taken from forumdisplay.php
 
 		// If this is a moved thread, then set the tid for participation marking and thread read marking to that of the moved thread
 		if (substr($row['thread_closed'], 0, 5) == 'moved') {
@@ -381,7 +381,7 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 		$rows[$row['tid']] = $row;
 	}
 
-	// This check for participation by the current user in any of these threads - for 'dot' folder icons - has also been adapted from inc/forumdisplay.php
+	// This check for participation by the current user in any of these threads - for 'dot' folder icons - has also been adapted from forumdisplay.php
 	if (!empty($tids)) {
 		$tids = implode(',', $tids);
 	}
@@ -397,7 +397,7 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 		}
 	}
 
-	// This logic for determining each thread's last read date by the user has also been taken from inc/forumdisplay.php
+	// This logic for determining each thread's last read date by the user has also been taken from forumdisplay.php
 	if ($mybb->user['uid'] && $mybb->settings['threadreadcut'] > 0 && !empty($rows)) {
 		$res = $db->simple_select('threadsread', '*', "uid='{$mybb->user['uid']}' AND tid IN ({$tids})");
 		while ($row = $db->fetch_array($res)) {
@@ -410,7 +410,7 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 		}
 	}
 
-	// This logic for determining each forum's read date cutoff has been adapted from inc/forumdisplay.php
+	// This logic for determining each forum's read date cutoff has been adapted from forumdisplay.php
 	$forum_reads = array();
 	foreach ($fids as $fid) {
 		$forum_reads[$fid] = 0;
@@ -513,7 +513,7 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 			} else	$latestposter_username_link = $latestposter_username;
 
 			// The below logic for determining the folder image, icon and whether to show an "unread" arrow
-			// has been adapted from code in inc/forumdisplay.php.
+			// has been adapted from code in forumdisplay.php.
 			$folder = '';
 			$folder_label = '';
 			$lang->load('forumdisplay');
