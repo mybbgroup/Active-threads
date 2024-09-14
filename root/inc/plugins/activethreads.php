@@ -477,17 +477,29 @@ table, td, th {
 </html>',
 			'version_at_last_mod' => 10206,
 		),
+		'activethreads_threadauthor_avatar_image'  => array(
+			'template_data'       => '<img src="{$useravatar[\'image\']}" alt="" {$useravatar[\'width_height\']} />',
+			'version_at_last_mod' => 10400,
+		),
 		'activethreads_threadauthor_avatar'  => array(
-			'template_data'       => '<a href="{$threadauthor_username_url}"><img src="{$useravatar[\'image\']}" alt="" {$useravatar[\'width_height\']} /></a>',
-			'version_at_last_mod' => 10206,
+			'template_data'       => '<a href="{$threadauthor_username_url}">{$threadauthor_avatar_image}</a>',
+			'version_at_last_mod' => 10400,
+		),
+		'activethreads_earliestposter_avatar_image' => array(
+			'template_data'       => '<img src="{$useravatar[\'image\']}" alt="" {$useravatar[\'width_height\']} />',
+			'version_at_last_mod' => 10400,
 		),
 		'activethreads_earliestposter_avatar' => array(
-			'template_data'       => '<a href="{$earliestposter_username_url}"><img src="{$useravatar[\'image\']}" alt="" {$useravatar[\'width_height\']} /></a>',
-			'version_at_last_mod' => 10206,
+			'template_data'       => '<a href="{$earliestposter_username_url}">{$earliestposter_avatar_image}</a>',
+			'version_at_last_mod' => 10400,
+		),
+		'activethreads_latestposter_avatar_image'   => array(
+			'template_data'       => '<img src="{$useravatar[\'image\']}" alt="" {$useravatar[\'width_height\']} />',
+			'version_at_last_mod' => 10400,
 		),
 		'activethreads_latestposter_avatar'   => array(
-			'template_data'       => '<a href="{$latestposter_username_url}"><img src="{$useravatar[\'image\']}" alt="" {$useravatar[\'width_height\']} /></a>',
-			'version_at_last_mod' => 10206,
+			'template_data'       => '<a href="{$latestposter_username_url}">{$latestposter_avatar_image}</a>',
+			'version_at_last_mod' => 10400,
 		),
 		'activethreads_threadauthor_username_link'   => array(
 			'template_data'       => '<a href="{$threadauthor_username_url}">{$threadauthor_username}</a>',

@@ -585,9 +585,12 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 			if ($settings[C_ACT.'_display_thread_avatar'] != 0) {
 				$margin_thread = $size + $avatar_margin;
 				$memprofile = get_user($row['thread_uid']);
-				$useravatar = format_avatar($memprofile['avatar']);
+				$useravatar = format_avatar(!empty($memprofile['avatar']) ? $memprofile['avatar']: '');
 				$useravatar['width_height'] = $dims;
-				eval('$threadauthor_avatar = "'.$templates->get('activethreads_threadauthor_avatar').'";');
+				eval('$threadauthor_avatar_image = "'.$templates->get('activethreads_threadauthor_avatar_image').'";');
+				if (isset($threadauthor_username_url)) {
+					eval('$threadauthor_avatar = "'.$templates->get('activethreads_threadauthor_avatar').'";');
+				} else	$threadauthor_avatar = $threadauthor_avatar_image;
 				$margin_thread = $avatar_margin;
 			} else {
 				$threadauthor_avatar = '';
@@ -595,9 +598,12 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 			}
 			if ($settings[C_ACT.'_display_earliestpost_avatar'] != 0) {
 				$memprofile = get_user($row['min_uid']);
-				$useravatar = format_avatar($memprofile['avatar']);
+				$useravatar = format_avatar(!empty($memprofile['avatar']) ? $memprofile['avatar'] : '');
 				$useravatar['width_height'] = $dims;
-				eval('$earliestpost_avatar = "'.$templates->get('activethreads_earliestposter_avatar').'";');
+				eval('$earliestposter_avatar_image = "'.$templates->get('activethreads_earliestposter_avatar_image').'";');
+				if (isset($earliestposter_username_url)) {
+					eval('$earliestpost_avatar = "'.$templates->get('activethreads_earliestposter_avatar').'";');
+				} else	$earliestpost_avatar = $earliestposter_avatar_image;
 				$margin_earliest = $avatar_margin;
 			} else {
 				$earliestpost_avatar = '';
@@ -605,9 +611,12 @@ LIMIT ".(($page-1) * ACT_ITEMS_PER_PAGE).", ".ACT_ITEMS_PER_PAGE;
 			}
 			if ($settings[C_ACT.'_display_latestpost_avatar'] != 0) {
 				$memprofile = get_user($row['max_uid']);
-				$useravatar = format_avatar($memprofile['avatar']);
+				$useravatar = format_avatar(!empty($memprofile['avatar']) ? $memprofile['avatar'] : '');
 				$useravatar['width_height'] = $dims;
-				eval('$latestpost_avatar = "'.$templates->get('activethreads_latestposter_avatar').'";');
+				eval('$latestposter_avatar_image = "'.$templates->get('activethreads_latestposter_avatar_image').'";');
+				if (isset($latestposter_username_url)) {
+					eval('$latestpost_avatar = "'.$templates->get('activethreads_latestposter_avatar').'";');
+				} else	$latestpost_avatar = $latestposter_avatar_image;
 				$margin_latest = $avatar_margin;
 			} else {
 				$latestpost_avatar = '';
