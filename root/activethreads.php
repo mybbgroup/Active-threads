@@ -234,9 +234,16 @@ if ($active_plugins && !empty($active_plugins['activethreads'])) {
 	$secs_before = $mins_before * 60;
 
 	if ($date) {
-		if ($mybb->user['dst'] == 1) {
-			$timezone = (float)$mybb->user['timezone']+1;
-		} else	$timezone = (float)$mybb->user['timezone'];
+		if (!empty($mybb->user['uid']) && isset($mybb->user['timezone'])) {
+			$timezone      = (float)$mybb->user['timezone'];
+			$dstcorrection = $mybb->user['dst'];
+		} else {
+			$timezone      = (float)$mybb->settings['timezoneoffset'];
+			$dstcorrection = $mybb->settings['dstcorrection'];
+		}
+		if ($dstcorrection == 1) {
+			$timezone++;
+		}
 		$tz_org = date_default_timezone_get();
 		date_default_timezone_set('GMT');
 		$ts_epoch = strtotime($date, TIME_NOW + $timezone*60*60) - $timezone*60*60;
